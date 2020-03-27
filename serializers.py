@@ -4,6 +4,6 @@ from edgetron.models import Catalog
 
 class CatalogSerializer(serializers.ModelSerializer):
     class Meta:
-        mode = Catalog
-        fields = [id, name, desc]
+        model = Catalog
+        fields = ['id', 'name', 'desc']
 
