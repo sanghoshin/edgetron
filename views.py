@@ -39,7 +39,7 @@ def catalog_onboard(request, id):
         if serializer.is_valid():
             try:
                 catalog = Catalog.objects.get(pk=id)
-            except ObjectDoesNotExist():
+            except Catalog.ObjectDoesNotExist():
                 return JsonResponse(serializer.errors, status=400)
             send_network_request()
         else:
