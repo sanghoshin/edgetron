@@ -5,6 +5,7 @@ from rest_framework.parsers import JSONParser
 from edgetron.models import Catalog
 from edgetron.serializers import CatalogSerializer
 
+import requests
 
 @csrf_exempt
 def catalog_list(request):
@@ -23,3 +24,25 @@ def catalog_list(request):
             serializer.save()
             return JsonResponse(serializer.data, status=201)
         return JsonResponse(serializer.errors, status=400)
+
+@csrf_exempt
+def catalog_onboard(request, id):
+    """
+    On board the catalog
+    """
+    if request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = CatalogSerializer(data=data)
+        catalog = Catalog.objects.get(id=id)
+
+        url = "http://127.0.0.1/sona/v2.0/networks"
+        headers = {'Content-Type', 'application/json'}
+        payload = {
+                'name': 'net1',
+                'provider:network_type': 'vlan',
+                'provider:physical_network': 'public',
+                'provider:segmentation_id': 2,
+                'provider:tenant_id': 1
+        }
+        r = requests.put(url, headers=headers, data=payload)
+        return JsonResponse(serializer.data, status=200)
