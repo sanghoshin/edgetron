@@ -1,5 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 
@@ -33,11 +33,15 @@ def catalog_onboard(request, id):
     """
     On board the catalog
     """
+    try:
+        catalog = Catalog.objects.get(pk=id)
+    except Catalog.DoesNotExist:
+        return HttpResponse(status=404)
+
     if request.method == 'POST':
         data = JSONParser().parse(request)
         serializer = CatalogSerializer(data=data)
         if serializer.is_valid():
-            catalog = Catalog.objects.get(pk=id)
             send_network_request()
         else:
             return JsonResponse(serializer.errors, status=400)
