@@ -29,12 +29,12 @@ def catalog_list(request):
 
 
 @csrf_exempt
-def catalog_onboard(request, id):
+def catalog_onboard(request, pk):
     """
     On board the catalog
     """
     try:
-        catalog = Catalog.objects.get(pk=id)
+        catalog = Catalog.objects.get(pk=pk)
     except Catalog.DoesNotExist:
         return HttpResponse(status=404)
 
