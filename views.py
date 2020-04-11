@@ -83,6 +83,7 @@ def send_network_request():
         'provider:tenant_id': 1
     }
     r = requests.put(url, headers=sona_headers, data=payload)
+    print(r.text)
 
 
 def send_createport_request():
@@ -100,3 +101,4 @@ def send_createport_request():
         }
     }
     r = requests.put(url, headers=sona_headers, data=payload)
+    print(r.text)
