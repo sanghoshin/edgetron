@@ -45,7 +45,9 @@ def catalog_onboard(request, pk):
         data = JSONParser().parse(request)
         serializer = CatalogSerializer(data=data)
         if serializer.is_valid():
-            send_network_request()
+            r = send_network_request()
+            if r.status_code != 200:
+                return JsonResponse(r.json(), r.status_code)
         else:
             return JsonResponse(serializer.errors, status=400)
 
@@ -66,7 +68,9 @@ def application_instantiate(request, pk):
         data = JSONParser().parse(request)
         serializer = CatalogSerializer(data=data)
         if serializer.is_valid():
-            send_createport_request()
+            r = send_createport_request()
+            if r.status_code != 200:
+                return JsonResponse(r.json(), r.status_code)
         else:
             return JsonResponse(serializer.errors, status=400)
 
@@ -83,7 +87,7 @@ def send_network_request():
         'provider:tenant_id': 1
     }
     r = requests.put(url, headers=sona_headers, data=payload)
-    print(r.text)
+    return r
 
 
 def send_createport_request():
@@ -101,4 +105,4 @@ def send_createport_request():
         }
     }
     r = requests.put(url, headers=sona_headers, data=payload)
-    print(r.text)
+    return r
