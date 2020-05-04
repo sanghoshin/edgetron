@@ -79,11 +79,14 @@ def deployment_application(request, pk):
 def send_network_request():
     url = sona_url + "networks"
     payload = {
-        'name': 'net1',
-        'provider:network_type': 'vlan',
-        'provider:physical_network': 'public',
-        'provider:segmentation_id': 2,
-        'provider:tenant_id': 1
+        "network": {
+            "id": "aabbcc1",
+            "name": "sample_network",
+            "admin_state_up": "true",
+            "dns_domain": "my-domain.org.",
+            "qos_policy_id": "6a8454ade84346f59e8d40665f878b2e",
+            "mtu": 1400
+        }
     }
     r = requests.put(url, headers=sona_headers, data=payload)
     return r
