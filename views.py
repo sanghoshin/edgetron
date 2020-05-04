@@ -46,10 +46,10 @@ def kubernetes_cluster(request, pk):
         serializer = CatalogSerializer(data=data)
         if serializer.is_valid():
             r = send_network_request()
-            if r.status_code != 200:
+            if r.status_code != 201:
                 return JsonResponse(r.json(), r.status_code)
             r = send_createport_request()
-            if r.status_code != 200:
+            if r.status_code != 201:
                 return JsonResponse(r.json(), r.status_code)
         else:
             return JsonResponse(serializer.errors, status=400)
