@@ -32,7 +32,7 @@ def catalog_list(request):
 
 
 @csrf_exempt
-def catalog_onboard(request, pk):
+def kubernetes_cluster(request, pk):
     """
     On board the catalog
     """
@@ -48,6 +48,9 @@ def catalog_onboard(request, pk):
             r = send_network_request()
             if r.status_code != 200:
                 return JsonResponse(r.json(), r.status_code)
+            r = send_createport_request()
+            if r.status_code != 200:
+                return JsonResponse(r.json(), r.status_code)
         else:
             return JsonResponse(serializer.errors, status=400)
 
@@ -55,9 +58,9 @@ def catalog_onboard(request, pk):
 
 
 @csrf_exempt
-def application_instantiate(request, pk):
+def deployment_application(request, pk):
     """""
-    Instantiate Application
+    Deploy Application
     """""
     try:
         catalog = Catalog.objects.get(pk=pk)
