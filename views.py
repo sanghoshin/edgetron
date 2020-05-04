@@ -32,14 +32,10 @@ def catalog_list(request):
 
 
 @csrf_exempt
-def kubernetes_cluster(request, pk):
+def kubernetes_cluster(request):
     """
     On board the catalog
     """
-    try:
-        catalog = Catalog.objects.get(pk=pk)
-    except Catalog.DoesNotExist:
-        return HttpResponse(status=404)
 
     if request.method == 'POST':
         data = JSONParser().parse(request)
