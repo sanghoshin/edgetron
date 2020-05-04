@@ -43,10 +43,10 @@ def kubernetes_cluster(request):
         if serializer.is_valid():
             r = send_network_request()
             if r.status_code != 201:
-                return JsonResponse(r.json(), r.status_code)
+                return JsonResponse(r.text, safe=False)
             r = send_createport_request()
             if r.status_code != 201:
-                return JsonResponse(r.json(), r.status_code)
+                return JsonResponse(r.text, safe=False)
         else:
             return JsonResponse(serializer.errors, status=400)
 
@@ -69,7 +69,7 @@ def deployment_application(request, pk):
         if serializer.is_valid():
             r = send_createport_request()
             if r.status_code != 200:
-                return JsonResponse(r.json(), r.status_code)
+                return JsonResponse(r.text, safe=False)
         else:
             return JsonResponse(serializer.errors, status=400)
 
@@ -88,7 +88,7 @@ def send_network_request():
             "mtu": 1400
         }
     }
-    r = requests.put(url, headers=sona_headers, data=payload)
+    r = requests.post(url, headers=sona_headers, json=payload)
     return r
 
 
@@ -106,5 +106,5 @@ def send_createport_request():
             "tenant_id": 1
         }
     }
-    r = requests.put(url, headers=sona_headers, data=payload)
+    r = requests.post(url, headers=sona_headers, json=payload)
     return r
