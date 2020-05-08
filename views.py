@@ -3,8 +3,8 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 
-from edgetron.models import Catalog
-from edgetron.serializers import CatalogSerializer
+from models import K8sCatalog
+from serializers import K8sCatalogSerializer
 
 import requests
 
@@ -18,13 +18,13 @@ def catalog_list(request):
     List all code catalogs, or create a new catalog.
     """
     if request.method == 'GET':
-        catalogs = Catalog.objects.all()
-        serializer = CatalogSerializer(catalogs, many=True)
+        catalogs = K8sCatalog.objects.all()
+        serializer = K8sCatalogSerializer(catalogs, many=True)
         return JsonResponse(serializer.data, safe=False)
 
     elif request.method == 'POST':
         data = JSONParser().parse(request)
-        serializer = CatalogSerializer(data=data)
+        serializer = K8sCatalogSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data, status=201)
@@ -39,7 +39,7 @@ def kubernetes_cluster(request):
 
     if request.method == 'POST':
         data = JSONParser().parse(request)
-        serializer = CatalogSerializer(data=data)
+        serializer = K8sCatalogSerializer(data=data)
         if serializer.is_valid():
             r = send_network_request()
             if r.status_code != 201:
@@ -59,13 +59,13 @@ def deployment_application(request, pk):
     Deploy Application
     """""
     try:
-        catalog = Catalog.objects.get(pk=pk)
-    except Catalog.DoesNotExist:
+        catalog = K8sCatalog.objects.get(pk=pk)
+    except K8sCatalog.DoesNotExist:
         return HttpResponse(status=404)
 
     if request.method == 'POST':
         data = JSONParser().parse(request)
-        serializer = CatalogSerializer(data=data)
+        serializer = K8sCatalogSerializer(data=data)
         if serializer.is_valid():
             r = send_createport_request()
             if r.status_code != 200:

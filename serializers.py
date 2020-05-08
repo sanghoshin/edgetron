@@ -1,9 +1,24 @@
 from rest_framework import serializers
-from edgetron.models import Catalog
+from models import K8sCatalog, Scaling, Interface
 
 
-class CatalogSerializer(serializers.ModelSerializer):
+class ScalingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Catalog
-        fields = ['id', 'name', 'desc']
+        model = Scaling
+        fields = ['init', 'maximum', 'minimum']
+
+
+class InterfaceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Interface
+        fields = ['ipVersion', 'ipAddress']
+
+
+class K8sCatalogSerializer(serializers.ModelSerializer):
+    scaling = ScalingSerializer()
+    interfaces = InterfaceSerializer()
+
+    class Meta:
+        model = K8sCatalog
+        fields = ['masterNodes', 'memory', 'storage', 'vcpus']
 
