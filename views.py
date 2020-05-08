@@ -3,8 +3,8 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 
-from models import K8sCatalog
-from serializers import K8sCatalogSerializer
+from edgetron.models import K8sCatalog
+from edgetron.serializers import K8sCatalogSerializer
 
 import requests
 

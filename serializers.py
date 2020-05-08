@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from models import K8sCatalog, Scaling, Interface
+from edgetron.models import K8sCatalog, Scaling, Interface
 
 
 class ScalingSerializer(serializers.ModelSerializer):
@@ -20,5 +20,5 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = K8sCatalog
-        fields = ['masterNodes', 'memory', 'storage', 'vcpus']
+        fields = ['scaling', 'interfaces', 'masterNodes', 'memory', 'storage', 'vcpus']
 
