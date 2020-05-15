@@ -6,7 +6,7 @@ from rest_framework.parsers import JSONParser
 from edgetron.models import K8sCatalog
 from edgetron.serializers import K8sCatalogSerializer
 
-import requests
+import requests, uuid
 
 sona_server_IP = "10.2.1.33"
 sona_url = "http://" + sona_server_IP + ":8181/onos/openstacknetworking/"
@@ -96,6 +96,7 @@ def send_createport_request():
     url = sona_url + "ports"
     payload = {
         "port": {
+            "id" : uuid.uuid4(),
             "name": "private-port",
             "network_id": "a87cc70a-3e15-4acf-8205-9b711a3531b7",
             "fixed_ips": [

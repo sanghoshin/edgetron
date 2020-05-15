@@ -8,8 +8,8 @@ class Scaling(models.Model):
 
 
 class Interface(models.Model):
-    ip_version = models.CharField(max_length=4, blank=False, default='IPv4')
-    ip_address = models.CharField(max_length=19, blank=False)
+    ipVersion = models.CharField(max_length=4, blank=False, default='IPv4')
+    ipAddress = models.CharField(max_length=19, blank=False)
 
 
 class K8sCatalog(models.Model):
@@ -18,7 +18,7 @@ class K8sCatalog(models.Model):
                                 on_delete=models.CASCADE)
     interfaces = models.ForeignKey(Interface, related_name="catalog",
                                    on_delete=models.CASCADE)
-    master_nodes = models.IntegerField()
+    masterNodes = models.IntegerField()
     memory = models.IntegerField()
     storage = models.IntegerField()
     vcpus = models.IntegerField()
