@@ -80,11 +80,10 @@ def send_network_request():
     url = sona_url + "networks"
     payload = {
         "network": {
-            "id": "aabbcc1",
+            "id": uuid.uuid4(),
             "name": "sample_network",
             "admin_state_up": "true",
-            "dns_domain": "my-domain.org.",
-            "qos_policy_id": "6a8454ade84346f59e8d40665f878b2e",
+            "dns_domain": "my-domain.org",
             "mtu": 1400
         }
     }
