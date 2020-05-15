@@ -80,7 +80,7 @@ def send_network_request():
     url = sona_url + "networks"
     payload = {
         "network": {
-            "id": uuid.uuid4(),
+            "id": str(uuid.uuid4()),
             "name": "sample_network",
             "admin_state_up": "true",
             "dns_domain": "my-domain.org",
@@ -95,7 +95,7 @@ def send_createport_request():
     url = sona_url + "ports"
     payload = {
         "port": {
-            "id" : uuid.uuid4(),
+            "id": str(uuid.uuid4()),
             "name": "private-port",
             "network_id": "a87cc70a-3e15-4acf-8205-9b711a3531b7",
             "fixed_ips": [
