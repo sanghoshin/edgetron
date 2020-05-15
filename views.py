@@ -50,7 +50,10 @@ def kubernetes_cluster(request):
             r = send_subnet_request(network_id, subnet_id)
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
-            r = send_createport_request()
+            port_id = str(uuid.uuid4())
+            ip_address = "10.10.1.2"
+            tenant_id = str(uuid.uuid4())
+            r = send_createport_request(network_id, port_id, ip_address, tenant_id)
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
         else:
@@ -87,6 +90,7 @@ def send_subnet_request(network_id, subnet_id):
     payload = {
         "subnet": {
             "id": subnet_id,
+            "name": "k8s VM subnet",
             "network_id": network_id,
             "ip_version": 4,
             "cidr": "192.168.199.0/24"
@@ -111,19 +115,19 @@ def send_network_request(network_id):
     return r
 
 
-def send_createport_request():
+def send_createport_request(nework_id, port_id, ip_address, tenant_id):
     url = sona_url + "ports"
     payload = {
         "port": {
-            "id": str(uuid.uuid4()),
+            "id": port_id,
             "name": "private-port",
-            "network_id": "a87cc70a-3e15-4acf-8205-9b711a3531b7",
+            "network_id": nework_id,
             "fixed_ips": [
                 {
-                    "ip_address": "12.12.11.12"
+                    "ip_address": ip_address
                 }
             ],
-            "tenant_id": 1
+            "tenant_id": tenant_id
         }
     }
     r = requests.post(url, headers=sona_headers, json=payload)
