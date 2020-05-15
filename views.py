@@ -41,7 +41,13 @@ def kubernetes_cluster(request):
         data = JSONParser().parse(request)
         serializer = K8sCatalogSerializer(data=data)
         if serializer.is_valid():
-            r = send_network_request()
+
+            network_id = str(uuid.uuid4())
+            r = send_network_request(network_id)
+            if r.status_code != 201:
+                return JsonResponse(r.text, safe=False)
+            subnet_id = str(uuid.uuid4())
+            r = send_subnet_request(network_id, subnet_id)
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
             r = send_createport_request()
@@ -76,11 +82,25 @@ def deployment_application(request, pk):
         return JsonResponse(serializer.data, status=200)
 
 
-def send_network_request():
+def send_subnet_request(network_id, subnet_id):
+    url = sona_url + "subnets"
+    payload = {
+        "subnet": {
+            "id": subnet_id,
+            "network_id": network_id,
+            "ip_version": 4,
+            "cidr": "192.168.199.0/24"
+        }
+    }
+    r = requests.post(url, headers=sona_headers, json=payload)
+    return r
+
+
+def send_network_request(network_id):
     url = sona_url + "networks"
     payload = {
         "network": {
-            "id": str(uuid.uuid4()),
+            "id": network_id,
             "name": "sample_network",
             "admin_state_up": "true",
             "dns_domain": "my-domain.org",
