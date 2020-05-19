@@ -60,10 +60,11 @@ def kubernetes_cluster(request):
 
             port_id = str(uuid.uuid4())
             ip_address = "10.10.1.2"
-            mac_address = [0x00, 0x16, 0x3e,
+            mac_data = [0x00, 0x16, 0x3e,
                             random.randint(0x00, 0x7f),
                             random.randint(0x00, 0xff),
                             random.randint(0x00, 0xff)]
+            mac_address = ':'.join(map(lambda x: "%02x" % x, mac_data))
             r = send_createport_request(network_id, subnet_id, port_id, ip_address, tenant_id, mac_address)
             if r.status_code != 201:
                return JsonResponse(r.text, safe=False)
