@@ -6,7 +6,7 @@ from rest_framework.parsers import JSONParser
 from edgetron.models import K8sCatalog
 from edgetron.serializers import K8sCatalogSerializer
 
-import requests, uuid
+import requests, uuid, random
 
 sona_server_IP = "10.2.1.33"
 sona_url = "http://" + sona_server_IP + ":8181/onos/openstacknetworking/"
@@ -60,9 +60,13 @@ def kubernetes_cluster(request):
 
             port_id = str(uuid.uuid4())
             ip_address = "10.10.1.2"
-            # r = send_createport_request(network_id, port_id, ip_address, tenant_id)
-            # if r.status_code != 201:
-            #    return JsonResponse(r.text, safe=False)
+            mac_address = [0x00, 0x16, 0x3e,
+                            random.randint(0x00, 0x7f),
+                            random.randint(0x00, 0xff),
+                            random.randint(0x00, 0xff)]
+            r = send_createport_request(network_id, subnet_id, port_id, ip_address, tenant_id, mac_address)
+            if r.status_code != 201:
+               return JsonResponse(r.text, safe=False)
         else:
             return JsonResponse(serializer.errors, status=400)
 
@@ -140,15 +144,19 @@ def send_network_request(network_id, segment_id, tenant_id):
     return r
 
 
-def send_createport_request(nework_id, port_id, ip_address, tenant_id):
+def send_createport_request(network_id, subnet_id, port_id, ip_address, tenant_id, mac_address):
     url = sona_url + "ports"
     payload = {
         "port": {
+            "status": "DOWN",
+            "binding:host_id": "",
             "id": port_id,
             "name": "private-port",
-            "network_id": nework_id,
+            "network_id": network_id,
+            "mac_address": mac_address,
             "fixed_ips": [
                 {
+                    "subnet_id": subnet_id,
                     "ip_address": ip_address
                 }
             ],
