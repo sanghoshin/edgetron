@@ -112,7 +112,6 @@ def send_subnet_request(network_id, subnet_id, tenant_id, cidr, start_ip, end_ip
             "tenant_id": tenant_id,
             "ip_version": 4,
             "cidr": "192.168.199.0/24",
-            "ip_version": 4,
             "gateway_ip": gateway,
         }
     }
