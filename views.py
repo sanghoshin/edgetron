@@ -3,7 +3,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 
-from edgetron.models import K8sCatalog
+from edgetron.models import K8sCatalog, Network, Subnet, Port
 from edgetron.serializers import K8sCatalogSerializer
 
 import requests, uuid, random
@@ -45,6 +45,11 @@ def kubernetes_cluster(request):
             network_id = str(uuid.uuid4())
             segment_id = 1
             tenant_id = str(uuid.uuid4())
+
+            network = Network(networkId=network_id, segmentId=segment_id,
+                              tenantId=tenant_id)
+            network.save()
+
             r = send_network_request(network_id, segment_id, tenant_id)
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
@@ -54,6 +59,12 @@ def kubernetes_cluster(request):
             start = "10.10.1.2"
             end = "10.10.1.255"
             gateway = "10.10.1.1"
+
+            subnet = Subnet(networkId=network_id, subnetId=subnet_id,
+                            tenantId=tenant_id, cidr=cidr, startIp=start,
+                            endIp=end, gateway=gateway)
+            subnet.save()
+
             r = send_subnet_request(network_id, subnet_id, tenant_id, cidr, start, end, gateway)
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
@@ -65,6 +76,10 @@ def kubernetes_cluster(request):
                             random.randint(0x00, 0xff),
                             random.randint(0x00, 0xff)]
             mac_address = ':'.join(map(lambda x: "%02x" % x, mac_data))
+
+            Port port = Port(portId=port_id, subnetId=subnet_id, networkId=network_id,
+                             tenantId=tenant_id, macAddress=mac_address)
+
             r = send_createport_request(network_id, subnet_id, port_id, ip_address, tenant_id, mac_address)
             if r.status_code != 201:
                return JsonResponse(r.text, safe=False)

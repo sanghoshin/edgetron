@@ -25,3 +25,36 @@ class K8sCatalog(models.Model):
 
     class Meta:
         ordering = ['created']
+
+
+class Network(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    networkId = models.CharField(max_length=40, blank=False)
+    segmentId = models.CharField(max_length=40, blank=False)
+    tenantId = models.IntegerField()
+
+    class Meta:
+        ordering = ['created']
+
+
+class SubNet(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    subnetId = models.CharField(max_length=40, blank=False)
+    networkId = models.CharField(max_length=40, blank=False)
+    tenantId = models.IntegerField()
+    cidr = models.CharField(max_length=22, blank=False)
+    startIp = models.CharField(max_length=19, blank=False)
+    endIp = models.CharField(max_length=19, blank=False)
+    gateway = models.CharField(max_length=19, blank=False)
+
+    class Meta:
+        ordering = ['created']
+
+
+class Port(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    portId = models.CharField(max_length=40, blank=False)
+    subnetId = models.CharField(max_length=40, blank=False)
+    networkId = models.CharField(max_length=40, blank=False)
+    tenantId = models.IntegerField()
+    macAddress = models.CharField(max_length=25, blank=False)
