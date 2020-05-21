@@ -28,11 +28,11 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
         k8s_data = K8sCatalog.objects.create(**validated_data)
         #validated_data['k8s_cluster_id'] = str(uuid.uuid4())
         scaling_data = validated_data.pop('scaling')
-        scaling = Scaling.objects.create(scaling_data)
+        scaling = Scaling.objects.create(**scaling_data)
         k8s_data.scaling = scaling
 
         interface_data = validated_data.pop('interfaces')
-        interfaces = Interface.objects.create(interface_data)
+        interfaces = Interface.objects.create(**interface_data)
         k8s_data.interfaces = interfaces
 
         #k8s_data['k8s_cluster_id'] = str(uuid.uuid4())
