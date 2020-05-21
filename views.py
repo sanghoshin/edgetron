@@ -41,9 +41,6 @@ def kubernetes_cluster(request):
         data = JSONParser().parse(request)
         serializer = K8sCatalogSerializer(data=data)
         if serializer.is_valid():
-
-            k8s_cluster_id = str(uuid.uuid4())
-            serializer.data['clusterId'] = k8s_cluster_id
             serializer.save()
 
             network_id = str(uuid.uuid4())
