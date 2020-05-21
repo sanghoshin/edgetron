@@ -71,7 +71,7 @@ class Port(models.Model):
     subnetId = models.CharField(max_length=40, blank=False)
     networkId = models.CharField(max_length=40, blank=False)
     tenantId = models.CharField(max_length=40, blank=False)
-    ipAddress = models.CharField(max_length=15, blank=False)
+    ipAddress = models.CharField(max_length=15, blank=False, default="127.0.0.1")
     macAddress = models.CharField(max_length=25, blank=False)
 
     class Meta:
