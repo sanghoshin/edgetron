@@ -78,7 +78,7 @@ def kubernetes_cluster(request):
             mac_address = ':'.join(map(lambda x: "%02x" % x, mac_data))
 
             port = Port(portId=port_id, subnetId=subnet_id, networkId=network_id,
-                             tenantId=tenant_id, macAddress=mac_address)
+                             tenantId=tenant_id, ipAddress=ip_address, macAddress=mac_address)
             port.save()
 
             r = send_createport_request(network_id, subnet_id, port_id, ip_address, tenant_id, mac_address)

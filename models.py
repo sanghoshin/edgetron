@@ -63,10 +63,12 @@ class Port(models.Model):
     subnetId = models.CharField(max_length=40, blank=False)
     networkId = models.CharField(max_length=40, blank=False)
     tenantId = models.CharField(max_length=40, blank=False)
+    ipAddress = models.CharField(max_length=15, blank=False)
     macAddress = models.CharField(max_length=25, blank=False)
 
     class Meta:
         ordering = ['created']
 
     def __str__(self):
-        return self.networkId + " : " + self.subnetId + " : " + self.portId + " : " + self.macAddress
+        return self.networkId + " : " + self.subnetId + " : " + \
+               self.portId + " : " + self.ipAddress + " : " + self.macAddress
