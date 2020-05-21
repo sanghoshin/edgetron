@@ -37,7 +37,7 @@ class Network(models.Model):
         ordering = ['created']
 
 
-class SubNet(models.Model):
+class Subnet(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     subnetId = models.CharField(max_length=40, blank=False)
     networkId = models.CharField(max_length=40, blank=False)
