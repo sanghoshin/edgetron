@@ -11,6 +11,9 @@ class Interface(models.Model):
     ipVersion = models.CharField(max_length=4, blank=False, default='IPv4')
     ipAddress = models.CharField(max_length=19, blank=False)
 
+    def __str__(self):
+        return "(" + self.ipAddress + ")"
+
 
 class K8sCatalog(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -18,6 +21,7 @@ class K8sCatalog(models.Model):
                                 on_delete=models.CASCADE)
     interfaces = models.ForeignKey(Interface, related_name="catalog",
                                    on_delete=models.CASCADE)
+    clusterId = models.CharField(max_length=40, blank=False)
     masterNodes = models.IntegerField()
     memory = models.IntegerField()
     storage = models.IntegerField()
@@ -25,6 +29,9 @@ class K8sCatalog(models.Model):
 
     class Meta:
         ordering = ['created']
+
+    def __str__(self):
+        return self.clusterId + ":" + self.interfaces + " : " + self.memory
 
 
 class Network(models.Model):
