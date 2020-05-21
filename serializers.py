@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from edgetron.models import K8sCatalog, Scaling, Interface
 
+import uuid
+
 
 class ScalingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,4 +23,9 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
     class Meta:
         model = K8sCatalog
         fields = ['scaling', 'interfaces', 'masterNodes', 'memory', 'storage', 'vcpus']
+
+    def create(self, validated_data):
+        validated_data['k8s_cluster_id'] = str(uuid.uuid4())
+        k8s_data = K8sCatalog.objects.create(**validated_data)
+        return k8s_data
 

@@ -1,5 +1,4 @@
 from django.db import models
-import uuid
 
 
 class Scaling(models.Model):
@@ -18,7 +17,7 @@ class Interface(models.Model):
 
 class K8sCatalog(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    k8s_cluster_id = str(uuid.uuid4())
+    k8s_cluster_id = models.CharField(max_length=40, blank=False)
     scaling = models.ForeignKey(Scaling, related_name="catalog",
                                 on_delete=models.CASCADE)
     interfaces = models.ForeignKey(Interface, related_name="catalog",
