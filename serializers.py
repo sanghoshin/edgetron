@@ -24,11 +24,16 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
         model = K8sCatalog
         fields = ['scaling', 'interfaces', 'masterNodes', 'memory', 'storage', 'vcpus']
 
-    #def create(self, validated_data):
+    def create(self, validated_data):
         #validated_data['k8s_cluster_id'] = str(uuid.uuid4())
-        #clusterId = validated_data.pop('k8s_cluster_id')
+        scaling_data = validated_data.pop('scaling')
+
         #clusterId = uuid.uuid4()
-        #k8s_data = K8sCatalog.objects.create(**validated_data)
+        k8s_data = K8sCatalog.objects.create(**validated_data)
+
+        scaling = Scaling.objects.create(scaling_data)
+        k8s_data['scaling'] = scaling
+
         #k8s_data['k8s_cluster_id'] = str(uuid.uuid4())
-        #return k8s_data
+        return k8s_data
 
