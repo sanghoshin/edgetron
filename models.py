@@ -36,6 +36,9 @@ class Network(models.Model):
     class Meta:
         ordering = ['created']
 
+    def __str__(self):
+        return self.networkId + " : " + self.segmentId + " : " + self.tenantId
+
 
 class Subnet(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -50,6 +53,9 @@ class Subnet(models.Model):
     class Meta:
         ordering = ['created']
 
+    def __str__(self):
+        return self.networkId + " : " + self.subnetId + " : " + self.cidr
+
 
 class Port(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -58,3 +64,9 @@ class Port(models.Model):
     networkId = models.CharField(max_length=40, blank=False)
     tenantId = models.CharField(max_length=40, blank=False)
     macAddress = models.CharField(max_length=25, blank=False)
+
+    class Meta:
+        ordering = ['created']
+
+    def __str__(self):
+        return self.networkId + " : " + self.subnetId + " : " + self.portId + " : " + self.macAddress

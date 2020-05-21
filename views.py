@@ -36,6 +36,7 @@ def kubernetes_cluster(request):
     """
     On board the catalog
     """
+    edgetronData =
 
     if request.method == 'POST':
         data = JSONParser().parse(request)
