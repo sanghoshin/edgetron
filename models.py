@@ -17,12 +17,11 @@ class Interface(models.Model):
 
 class K8sCatalog(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    #k8s_cluster_id = models.CharField(max_length=40, blank=False)
     scaling = models.ForeignKey(Scaling, related_name="catalog",
                                 on_delete=models.CASCADE)
     interfaces = models.ForeignKey(Interface, related_name="catalog",
                                    on_delete=models.CASCADE)
-    #clusterId = models.CharField(max_length=40, blank=False)
+    clusterId = models.CharField(max_length=40, blank=False)
     masterNodes = models.IntegerField()
     memory = models.IntegerField()
     storage = models.IntegerField()
