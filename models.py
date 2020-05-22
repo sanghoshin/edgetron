@@ -31,7 +31,7 @@ class K8sCatalog(models.Model):
         ordering = ['created']
 
     def __str__(self):
-        return self.clusterId + ":" + str(self.interfaces) + " : " + self.memory
+        return self.clusterId + ":" + str(self.interfaces) + " : " + str(self.memory)
 
 
 class Network(models.Model):
