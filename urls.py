@@ -4,5 +4,5 @@ from edgetron import views
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('edgetron/resources/kubernetes', views.kubernetes_cluster),
-    path('edgetron/resources/kubernetes/application/deployment', views.kubernetes_cluster),
+    path('edgetron/resources/kubernetes/application/deployment/<int:cid>/<int:chartid>/', views.deployment_application),
 ]

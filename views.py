@@ -6,7 +6,7 @@ from rest_framework.parsers import JSONParser
 from edgetron.models import K8sCatalog, Network, Subnet, Port
 from edgetron.serializers import K8sCatalogSerializer
 
-import requests, uuid, random
+import requests, uuid, random, subprocess, logging
 
 sona_server_IP = "10.2.1.33"
 sona_url = "http://" + sona_server_IP + ":8181/onos/openstacknetworking/"
@@ -92,12 +92,12 @@ def kubernetes_cluster(request):
 
 
 @csrf_exempt
-def deployment_application(request, pk):
+def deployment_application(request, cid, chartid):
     """""
     Deploy Application
     """""
     try:
-        catalog = K8sCatalog.objects.get(pk=pk)
+        catalog = K8sCatalog.objects.get(pk=cid)
     except K8sCatalog.DoesNotExist:
         return HttpResponse(status=404)
 
@@ -105,9 +105,9 @@ def deployment_application(request, pk):
         data = JSONParser().parse(request)
         serializer = K8sCatalogSerializer(data=data)
         if serializer.is_valid():
-            r = send_createport_request()
-            if r.status_code != 200:
-                return JsonResponse(r.text, safe=False)
+            chart_path = get_chart_path(chartid)
+            host_ip = get_host_ip(cid)
+            deploy(host_ip, chart_path)
         else:
             return JsonResponse(serializer.errors, status=400)
 
@@ -183,3 +183,30 @@ def send_createport_request(network_id, subnet_id, port_id, ip_address, tenant_i
     }
     r = requests.post(url, headers=sona_headers, json=payload)
     return r
+
+
+def get_chart_path(chart_id):
+    """ Originally chart path needs to be extracted from DB
+        using the chart_id """
+    return "bitnami/nginx"
+
+
+def get_host_ip(cid):
+    """ Originally host ip needs to be extracted from DB
+        using the cluster_id """
+    return "10.2.1.68"
+
+
+def deploy(host_ip, chart_path):
+    command = "helm install my-release " + chart_path
+
+    ssh = subprocess.Popen(["ssh", "%s" % host_ip, command],
+                           shell=False,
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE)
+    result = ssh.stdout.readlines()
+    if result == []:
+        error = ssh.stderr.readlines()
+        logging.debug(error)
+    else:
+        logging.info(result)
