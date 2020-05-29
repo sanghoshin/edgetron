@@ -176,9 +176,3 @@ REST_FRAMEWORK = {
     ]
 }
 ```
-
-
-How to install
-
-Example : 
-
