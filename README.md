@@ -1,20 +1,43 @@
 # edgetron
 
-How to run 
+MEC Platform MM3 interface handler for EdgeStack 
 
-uwsgi --http :8080 --chdir=/home/ubuntu/mysite --module=mysite.wsgi:application --env DJANGO_SETTINGS_MODULE=mysite.settings
+## Getting Started
 
-How to install
+### Prerequisites
 
-Create your own project 
-https://docs.djangoproject.com/en/3.0/intro/tutorial01/
+Install python3 ,pip3, Django REST API framework, uwsgi, pygments, requests, subprocess
 
+```
+sudo apt-get install python3-pip
+python -m pip install djangorestframework
+python -m pip install django-filter
+python -m pip install markdown
+python -m pip install uwsgi
+python -m pip install pygments
+python -m pip subprocess.run
+```
+
+### How to install
+
+1. Create your own project  (refer to https://docs.djangoproject.com/en/3.0/intro/tutorial01/)
+
+```
 django-admin startproject mysite
+```
 
-Configuration the setting (settings.py under your project )
+2. Configuration the setting (settings.py under your project )
 
-Example : 
+Please see the example below
 
+### How to run 
+```
+uwsgi --http :8080 --chdir=/home/ubuntu/mysite --module=mysite.wsgi:application --env DJANGO_SETTINGS_MODULE=mysite.settings
+```
+
+Example configuration
+
+```
 """
 Django settings for mysite project.
 
@@ -152,3 +175,10 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.JSONParser',
     ]
 }
+```
+
+
+How to install
+
+Example : 
+
