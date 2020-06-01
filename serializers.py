@@ -35,10 +35,12 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
         memory = validated_data.pop('memory')
         storage = validated_data.pop('storage')
         vcpus = validated_data.pop('vcpus')
+        version = validated_data.pop('version')
+        image = validated_data.pop('image')
 
         k8s_data = K8sCatalog.objects.create(scaling=scaling, interfaces=interfaces, clusterId=str(uuid.uuid4()),
                                            masterNodes=masterNodes, memory=memory, storage=storage,
-                                             vcpus=vcpus)
+                                             vcpus=vcpus, version=version, image=image)
 
         return k8s_data
 

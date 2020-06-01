@@ -6,10 +6,16 @@ from rest_framework.parsers import JSONParser
 from edgetron.models import K8sCatalog, Network, Subnet, Port
 from edgetron.serializers import K8sCatalogSerializer
 from edgetron.sonahandler import SonaHandler
+from edgetron.hostmanager import HostManager
+from edgetron.ipmanager import IpManager
 
 import uuid, random, subprocess, logging
 
 sona_ip = "10.2.1.33"
+host_list = ["10.2.1.68", "10.2.1.69", "10.2.1.70"]
+host_manager = HostManager(host_list)
+ip_manager = IpManager("10.10.1", "192.168.0")
+
 
 @csrf_exempt
 def catalog_list(request):
@@ -35,7 +41,6 @@ def kubernetes_cluster(request):
     """
     On board the catalog
     """
-
     sona = SonaHandler(sona_ip)
 
     if request.method == 'POST':
@@ -44,10 +49,11 @@ def kubernetes_cluster(request):
         if serializer.is_valid():
             serializer.save()
 
+            cluster_id = serializer.clusterId
             network_id = str(uuid.uuid4())
             segment_id = 1
             tenant_id = str(uuid.uuid4())
-            network = Network(networkId=network_id, segmentId=segment_id,
+            network = Network(clusterId=cluster_id, networkId=network_id, segmentId=segment_id,
                               tenantId=tenant_id)
             network.save()
 
@@ -72,17 +78,27 @@ def kubernetes_cluster(request):
             port_id = str(uuid.uuid4())
             ip_address = "10.10.1.2"
             mac_data = [0x00, 0x16, 0x3e,
-                            random.randint(0x00, 0x7f),
-                            random.randint(0x00, 0xff),
-                            random.randint(0x00, 0xff)]
+                        random.randint(0x00, 0x7f),
+                        random.randint(0x00, 0xff),
+                        random.randint(0x00, 0xff)]
             mac_address = ':'.join(map(lambda x: "%02x" % x, mac_data))
             port = Port(portId=port_id, subnetId=subnet_id, networkId=network_id,
-                             tenantId=tenant_id, ipAddress=ip_address, macAddress=mac_address)
+                        tenantId=tenant_id, ipAddress=ip_address, macAddress=mac_address)
             port.save()
 
             r = sona.send_createport_request(network_id, subnet_id, port_id, ip_address, tenant_id, mac_address)
             if r.status_code != 201:
-               return JsonResponse(r.text, safe=False)
+                return JsonResponse(r.text, safe=False)
+
+            vcpus = serializer.vcpus
+            memory = serializer.memory
+            storage = serializer.storage
+            host_ip = host_manager.allocate(cluster_id, vcpus, memory, storage)
+            k8s_version = serializer.version
+            image_name = serializer.image
+            vm_ip = ip_manager.allocate_ip(port_id)
+            bootstrap_nw_ip = ip_manager.get_bootstrap_nw_ip(port_id)
+
         else:
             return JsonResponse(serializer.errors, status=400)
 
@@ -104,7 +120,7 @@ def deployment_application(request, cid, chartid):
         serializer = K8sCatalogSerializer(data=data)
         if serializer.is_valid():
             chart_path = get_chart_path(chartid)
-            host_ip = get_host_ip(cid)
+            host_ip = host_manager.get_host_ip(cid)
             deploy(host_ip, chart_path)
         else:
             return JsonResponse(serializer.errors, status=400)
@@ -112,17 +128,10 @@ def deployment_application(request, cid, chartid):
         return JsonResponse(serializer.data, status=200)
 
 
-
 def get_chart_path(chart_id):
     """ Originally chart path needs to be extracted from DB
         using the chart_id """
     return "bitnami/nginx"
-
-
-def get_host_ip(cid):
-    """ Originally host ip needs to be extracted from DB
-        using the cluster_id """
-    return "10.2.1.68"
 
 
 def deploy(host_ip, chart_path):
@@ -133,7 +142,7 @@ def deploy(host_ip, chart_path):
                            stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE)
     result = ssh.stdout.readlines()
-    if result == []:
+    if not result:
         error = ssh.stderr.readlines()
         logging.debug(error)
     else:

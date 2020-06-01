@@ -1,6 +1,7 @@
 import requests
 
-class SonaHandler
+
+class SonaHandler:
     sona_server_ip = ""
     sona_url = "http://" + sona_server_ip + ":8181/onos/openstacknetworking/"
     sona_headers = {'Content-Type': 'application/json', 'Authorization': 'Basic b25vczpyb2Nrcw=='}
@@ -34,7 +35,6 @@ class SonaHandler
         r = requests.post(url, headers=self.sona_headers, json=payload)
         return r
 
-
     def create_network(self, network_id, segment_id, tenant_id):
         url = self.sona_url + "networks"
         payload = {
@@ -54,7 +54,6 @@ class SonaHandler
         }
         r = requests.post(url, headers=self.sona_headers, json=payload)
         return r
-
 
     def create_port(self, network_id, subnet_id, port_id, ip_address, tenant_id, mac_address):
         url = self.sona_url + "ports"

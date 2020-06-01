@@ -26,6 +26,8 @@ class K8sCatalog(models.Model):
     memory = models.IntegerField()
     storage = models.IntegerField()
     vcpus = models.IntegerField()
+    version = models.CharField(max_length=10, blank=True, default="1.17")
+    image = models.CharField(max_length=20, blank=False)
 
     class Meta:
         ordering = ['created']
@@ -36,6 +38,7 @@ class K8sCatalog(models.Model):
 
 class Network(models.Model):
     created = models.DateTimeField(auto_now_add=True)
+    clusterId = models.CharField(max_length=40, blank=False)
     networkId = models.CharField(max_length=40, blank=False)
     segmentId = models.CharField(max_length=40, blank=False)
     tenantId = models.CharField(max_length=40, blank=False)
@@ -44,7 +47,7 @@ class Network(models.Model):
         ordering = ['created']
 
     def __str__(self):
-        return self.networkId + " : " + self.segmentId + " : " + self.tenantId
+        return self.clusterId + " : " + self.networkId + " : " + self.segmentId + " : " + self.tenantId
 
 
 class Subnet(models.Model):
