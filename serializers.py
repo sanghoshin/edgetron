@@ -26,6 +26,7 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
     storage = ""
     version = ""
     image = ""
+    masterNodes = 0
 
     class Meta:
         model = K8sCatalog
@@ -33,22 +34,22 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         scaling_data = validated_data.pop('scaling')
-        scaling = Scaling.objects.create(**scaling_data)
+        self.scaling = Scaling.objects.create(**scaling_data)
 
         interface_data = validated_data.pop('interfaces')
-        interfaces = Interface.objects.create(**interface_data)
+        self.interfaces = Interface.objects.create(**interface_data)
 
-        clusterName = validated_data.pop('name')
-        masterNodes = validated_data.pop('masterNodes')
-        memory = validated_data.pop('memory')
-        storage = validated_data.pop('storage')
-        vcpus = validated_data.pop('vcpus')
-        version = validated_data.pop('version')
-        image = validated_data.pop('image')
+        self.clusterName = validated_data.pop('name')
+        self.masterNodes = validated_data.pop('masterNodes')
+        self.memory = validated_data.pop('memory')
+        self.storage = validated_data.pop('storage')
+        self.vcpus = validated_data.pop('vcpus')
+        self.version = validated_data.pop('version')
+        self.image = validated_data.pop('image')
 
-        k8s_data = K8sCatalog.objects.create(name=clusterName, scaling=scaling, interfaces=interfaces,
-                                             clusterId=str(uuid.uuid4()), masterNodes=masterNodes, memory=memory,
-                                             storage=storage, vcpus=vcpus, version=version, image=image)
+        k8s_data = K8sCatalog.objects.create(name=self.clusterName, scaling=self.scaling, interfaces=self.interfaces,
+                                             clusterId=str(uuid.uuid4()), masterNodes=self.masterNodes, memory=self.memory,
+                                             storage=self.storage, vcpus=self.vcpus, version=self.version, image=self.image)
 
         return k8s_data
 
