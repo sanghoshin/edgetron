@@ -25,6 +25,7 @@ sona_ip = "10.2.1.33"
 host_list = ["10.2.1.68", "10.2.1.69", "10.2.1.70"]
 host_manager = HostManager(host_list)
 ip_manager = IpManager("10.10.1", "192.168.0")
+flat_network_id = str(uuid.uuid4()) # Need to be predefined
 
 
 @csrf_exempt
@@ -124,6 +125,32 @@ def kubernetes_cluster(request):
             cluster_yaml = create_cluster_yaml(cluster)
             # create_cluster(cluster_yaml)
             logging.info(cluster_yaml)
+
+            # Define flat and default network
+            flat_net = Network(network_id)
+            flat_net.withIpAddress("10.10.10.5") \
+                .withSubnet("10.10.10.0/24")
+            default_net = Network(flat_network_id)
+            default_net.withIpAddress("20.20.20.5") \
+                .withSubnet("20.20.20.0/24") \
+                .setPrimary(True)
+
+            # Create a master node
+            master = Machine()
+            master.withCluster(cluster) \
+                .withMachineType("master") \
+                .withVcpuNum(vcpus) \
+                .withMemorySize(memory) \
+                .withDiskSize(storage) \
+                .withHostIpaddress(host_ip) \
+                .appendNet(flat_net) \
+                .appendNet(default_net) \
+                .withCniName("sona-pt") \
+                .appendCniOption("onos-ip", sona_ip)
+
+            master_yaml = create_machine_yaml(master)
+            # create_machine(master_yaml)
+            logging.info(master_yaml)
 
 
         else:
