@@ -100,7 +100,7 @@ def kubernetes_cluster(request):
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
 
-            cluster_name = serializer.name
+            cluster_name = serializer.clusterName
             vcpus = serializer.vcpus
             memory = serializer.memory
             storage = serializer.storage
