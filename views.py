@@ -152,8 +152,12 @@ def kubernetes_cluster(request):
                         random.randint(0x00, 0xff),
                         random.randint(0x00, 0xff)]
             mac_address = ':'.join(map(lambda x: "%02x" % x, mac_data))
-            port = SonaPort(portId=port_id, subnetId=subnet_id, networkId=network_id,
-                            tenantId=tenant_id, ipAddress=ip_address, macAddress=mac_address)
+            port = SonaPort(portId=port_id,
+                            subnetId=subnet.subnetId,
+                            networkId=subnet.networkId,
+                            tenantId=subnet.tenantId,
+                            ipAddress=ip_address,
+                            macAddress=mac_address)
             port.save()
 
             r = sona.create_port(port)
