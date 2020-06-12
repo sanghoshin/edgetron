@@ -11,11 +11,11 @@ class SonaHandler:
         url = self.sona_url + "subnets"
         payload = {
             "subnet": {
-                "id": subnet.subnet_id,
+                "id": subnet.subnetId,
                 "allocation_pools": [
                     {
-                        "start": subnet.start_ip,
-                        "end": subnet.end_ip
+                        "start": subnet.startIp,
+                        "end": subnet.endIp
                     }
                 ],
                 "cidr": subnet.cidr,
@@ -23,8 +23,8 @@ class SonaHandler:
                 "subnetpool_id": "null",
                 "enable_dhcp": "true",
                 "name": "k8s VM subnet",
-                "network_id": subnet.network_id,
-                "tenant_id": subnet.tenant_id,
+                "network_id": subnet.networkId,
+                "tenant_id": subnet.tenantId,
                 "ip_version": 4,
                 "gateway_ip": subnet.gateway,
             }
@@ -38,12 +38,12 @@ class SonaHandler:
             "network": {
                 "status": "ACTIVE",
                 "subnets": [],
-                "id": network.network_id,
-                "provider:segmentation_id": network.segment_id,
+                "id": network.networkId,
+                "provider:segmentation_id": network.segmentId,
                 "is_default": "false",
                 "port_security_enabled": "true",
                 "name": "k8s_vm_network",
-                "tenant_id": network.tenant_id,
+                "tenant_id": network.tenantId,
                 "admin_state_up": "true",
                 "provider:network_type": "vxlan",
                 "mtu": 1450
