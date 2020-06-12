@@ -3,11 +3,12 @@ import requests
 
 class SonaHandler:
     sona_server_ip = ""
-    sona_url = "http://" + sona_server_ip + ":8181/onos/openstacknetworking/"
+    sona_url = ""
     sona_headers = {'Content-Type': 'application/json', 'Authorization': 'Basic b25vczpyb2Nrcw=='}
 
     def __init__(self, sona_ip):
         sona_server_ip = sona_ip
+        sona_url = "http://" + sona_server_ip + ":8181/onos/openstacknetworking/"
 
     def create_subnet(self, network_id, subnet_id, tenant_id, cidr, start_ip, end_ip, gateway):
         url = self.sona_url + "subnets"
