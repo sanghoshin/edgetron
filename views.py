@@ -151,8 +151,8 @@ def kubernetes_cluster(request):
             # create_machineset(worker_set_yaml)
             logging.info(worker_set_yaml)
 
-            status = get_cluster_status(cluster_id)
-            logging.info(status)
+            #status = get_cluster_status(cluster_id)
+            #logging.info(status)
 
 
             r = sona.create_port(network_id, subnet_id, port_id, ip_address, tenant_id, mac_address)
