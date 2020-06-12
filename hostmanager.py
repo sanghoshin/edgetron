@@ -6,7 +6,7 @@ class HostManager:
 
     def __init__(self, hosts):
         for item in hosts:
-            self.hostAllocations.add(item, [])
+            self.hostAllocations[item] = []
 
     def add_host(self, hostIp):
         self.hostAllocations[hostIp] = []
