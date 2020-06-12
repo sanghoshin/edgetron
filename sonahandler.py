@@ -2,9 +2,8 @@ import requests
 
 
 class SonaHandler:
-    sona_headers = {'Content-Type': 'application/json', 'Authorization': 'Basic b25vczpyb2Nrcw=='}
-
     def __init__(self, sona_ip):
+        self.sona_headers = {'Content-Type': 'application/json', 'Authorization': 'Basic b25vczpyb2Nrcw=='}
         self.sona_server_ip = sona_ip
         self.sona_url = "http://" + self.sona_server_ip + ":8181/onos/openstacknetworking/"
 
