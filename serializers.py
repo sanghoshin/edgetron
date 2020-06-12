@@ -21,6 +21,11 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
     interfaces = InterfaceSerializer()
     clusterId = ""
     clusterName = ""
+    vcpus = ""
+    memory = ""
+    storage = ""
+    version = ""
+    image = ""
 
     class Meta:
         model = K8sCatalog

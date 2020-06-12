@@ -9,7 +9,7 @@ class IpManager:
 
     def allocate_ip(self, port_id):
         for ip in range(1, 255):
-            if self.allocate_ip[ip] == '':
+            if self.ipAllocations[ip] == '':
                 self.ipAllocation[ip] = port_id
                 ip_address = self.vm_subnet + "." + str(ip)
                 return ip_address
@@ -17,7 +17,7 @@ class IpManager:
 
     def get_bootstrap_nw_ip(self, port_id):
         for ip in range(1, 255):
-            if self.allocate_ip[ip] == '':
+            if self.ipAllocations[ip] == '':
                 self.ipAllocation[ip] = port_id
                 ip_address = self.vm_subnet + "." + str(ip)
                 return ip_address
