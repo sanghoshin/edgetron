@@ -11,7 +11,7 @@ class SonaHandler:
         url = self.sona_url + "subnets"
         payload = {
             "subnet": {
-                "id": subnet.subnetId
+                "id": subnet.subnetId,
                 "cidr": subnet.cidr,
                 "host_routes": [],
                 "subnetpool_id": "null",
@@ -45,23 +45,23 @@ class SonaHandler:
         r = requests.post(url, headers=self.sona_headers, json=payload)
         return r
 
-    def create_port(self, network_id, subnet_id, port_id, ip_address, tenant_id, mac_address):
+    def create_port(self, port):
         url = self.sona_url + "ports"
         payload = {
             "port": {
                 "status": "DOWN",
                 "binding:host_id": "",
-                "id": port_id,
+                "id": port.pordId,
                 "name": "private-port",
-                "network_id": network_id,
-                "mac_address": mac_address,
+                "network_id": port.networkId,
+                "mac_address": port.macAddress,
                 "fixed_ips": [
                     {
-                        "subnet_id": subnet_id,
-                        "ip_address": ip_address
+                        "subnet_id": port.subnetId,
+                        "ip_address": port.ipAddress
                     }
                 ],
-                "tenant_id": tenant_id
+                "tenant_id": port.tenantId
             }
         }
         r = requests.post(url, headers=self.sona_headers, json=payload)

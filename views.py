@@ -156,7 +156,7 @@ def kubernetes_cluster(request):
                             tenantId=tenant_id, ipAddress=ip_address, macAddress=mac_address)
             port.save()
 
-            r = sona.create_port(network_id, subnet_id, port_id, ip_address, tenant_id, mac_address)
+            r = sona.create_port(port)
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
 
