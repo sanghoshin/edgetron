@@ -39,7 +39,7 @@ class K8sCatalog(models.Model):
 
 class Network(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    clusterId = models.CharField(max_length=40, blank=False)
+    clusterId = models.CharField(max_length=40, blank=False, default="0")
     networkId = models.CharField(max_length=40, blank=False)
     segmentId = models.CharField(max_length=40, blank=False)
     tenantId = models.CharField(max_length=40, blank=False)
