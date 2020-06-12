@@ -6,6 +6,8 @@ class IpManager:
     def __init__(self, vm_subnet, bootstrap_subnet):
         self.vm_subnet = vm_subnet
         self.bootstrap_subnet = bootstrap_subnet
+        for ip in range(1, 255):
+            self.ipAllocations[ip] = ''
 
     def allocate_ip(self, port_id):
         for ip in range(1, 255):
