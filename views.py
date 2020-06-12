@@ -170,6 +170,9 @@ def kubernetes_cluster(request):
             # create_machineset(worker_set_yaml)
             logging.info(worker_set_yaml)
 
+            status = get_cluster_status()
+            logging.info(status)
+
         else:
             return JsonResponse(serializer.errors, status=400)
 
