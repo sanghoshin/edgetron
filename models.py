@@ -57,9 +57,6 @@ class SonaSubnet(models.Model):
     networkId = models.CharField(max_length=40, blank=False)
     tenantId = models.CharField(max_length=40, blank=False)
     cidr = models.CharField(max_length=22, blank=False)
-    startIp = models.CharField(max_length=19, blank=False)
-    endIp = models.CharField(max_length=19, blank=False)
-    gateway = models.CharField(max_length=19, blank=False)
 
     class Meta:
         ordering = ['created']

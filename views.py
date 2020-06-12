@@ -27,7 +27,7 @@ host_manager = HostManager(host_list)
 ip_manager = IpManager("10.10.1", "192.168.0")
 flat_network_id = str(uuid.uuid4()) # Need to be configured
 flat_network_cidr = "10.10.10.0/24" # Need to be configured
-
+vm_network_cidr = "10.10.1.0/24" # Need to be configured
 
 @csrf_exempt
 def catalog_list(request):
@@ -61,55 +61,37 @@ def kubernetes_cluster(request):
         if serializer.is_valid():
             serializer.save()
 
-            cluster_id = serializer.clusterId
-            network_id = str(uuid.uuid4())
-            segment_id = 1
-            tenant_id = str(uuid.uuid4())
-            vm_network = SonaNetwork(clusterId=cluster_id, networkId=network_id, segmentId=segment_id,
-                              tenantId=tenant_id)
+            vm_network = SonaNetwork(clusterId=serializer.clusterId,
+                                     networkId=str(uuid.uuid4()),
+                                     segmentId=1,
+                                     tenantId=str(uuid.uuid4()))
             vm_network.save()
-
             r = sona.create_network(vm_network)
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
 
-            subnet_id = str(uuid.uuid4())
-            cidr = "10.10.1.0/24"
-            start = "10.10.1.2"
-            end = "10.10.1.255"
-            gateway = "10.10.1.1"
-            subnet = SonaSubnet(networkId=network_id, subnetId=subnet_id,
-                            tenantId=tenant_id, cidr=cidr, startIp=start,
-                            endIp=end, gateway=gateway)
+            subnet = SonaSubnet(networkId=vm_network.networkId,
+                                subnetId=str(uuid.uuid4()),
+                                tenantId=vm_network.tenantId,
+                                cidr=vm_network_cidr)
             subnet.save()
-
             r = sona.create_subnet(subnet)
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
 
-            port_id = str(uuid.uuid4())
-            ip_address = "10.10.1.2"
-            mac_data = [0x00, 0x16, 0x3e,
-                        random.randint(0x00, 0x7f),
-                        random.randint(0x00, 0xff),
-                        random.randint(0x00, 0xff)]
-            mac_address = ':'.join(map(lambda x: "%02x" % x, mac_data))
-            port = SonaPort(portId=port_id, subnetId=subnet_id, networkId=network_id,
-                        tenantId=tenant_id, ipAddress=ip_address, macAddress=mac_address)
-            port.save()
 
             vcpus = serializer.vcpus
             memory = serializer.memory
             storage = serializer.storage
-            host_ip = host_manager.allocate(cluster_id, vcpus, memory, storage)
+            host_ip = host_manager.allocate(vm_network.clusterId, vcpus, memory, storage)
             k8s_version = serializer.version
             image_name = serializer.image
-            vm_ip = ip_manager.allocate_ip(port_id)
-            bootstrap_nw_ip = ip_manager.get_bootstrap_nw_ip(port_id)
+            #vm_ip = ip_manager.allocate_ip(port_id)
+            #bootstrap_nw_ip = ip_manager.get_bootstrap_nw_ip(port_id)
 
             # Create a cluster
             cluster = Cluster()
-            cluster.withClusterName(cluster_id) \
+            cluster.withClusterName(vm_network.clusterId) \
                 .withKubeVersion(k8s_version) \
                 .withOsDistro(image_name)
 
@@ -118,10 +100,10 @@ def kubernetes_cluster(request):
             logging.info(cluster_yaml)
 
             # Define flat and default network
-            flat_net = Network(network_id)
+            flat_net = Network(vm_network.networkId)
             flat_net.withSubnet(flat_network_cidr)
             default_net = Network(flat_network_id)
-            default_net.withSubnet(cidr) \
+            default_net.withSubnet(vm_network_cidr) \
                 .setPrimary(True)
 
             # Create a master node
@@ -162,6 +144,17 @@ def kubernetes_cluster(request):
             #status = get_cluster_status(cluster_id)
             #logging.info(status)
 
+
+            port_id = str(uuid.uuid4())
+            ip_address = "10.10.1.2"
+            mac_data = [0x00, 0x16, 0x3e,
+                        random.randint(0x00, 0x7f),
+                        random.randint(0x00, 0xff),
+                        random.randint(0x00, 0xff)]
+            mac_address = ':'.join(map(lambda x: "%02x" % x, mac_data))
+            port = SonaPort(portId=port_id, subnetId=subnet_id, networkId=network_id,
+                            tenantId=tenant_id, ipAddress=ip_address, macAddress=mac_address)
+            port.save()
 
             r = sona.create_port(network_id, subnet_id, port_id, ip_address, tenant_id, mac_address)
             if r.status_code != 201:

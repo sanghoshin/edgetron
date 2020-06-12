@@ -11,13 +11,7 @@ class SonaHandler:
         url = self.sona_url + "subnets"
         payload = {
             "subnet": {
-                "id": subnet.subnetId,
-                "allocation_pools": [
-                    {
-                        "start": subnet.startIp,
-                        "end": subnet.endIp
-                    }
-                ],
+                "id": subnet.subnetId
                 "cidr": subnet.cidr,
                 "host_routes": [],
                 "subnetpool_id": "null",
@@ -25,8 +19,7 @@ class SonaHandler:
                 "name": "k8s VM subnet",
                 "network_id": subnet.networkId,
                 "tenant_id": subnet.tenantId,
-                "ip_version": 4,
-                "gateway_ip": subnet.gateway,
+                "ip_version": 4
             }
         }
         r = requests.post(url, headers=self.sona_headers, json=payload)
