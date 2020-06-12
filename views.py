@@ -101,8 +101,8 @@ def kubernetes_cluster(request):
 
             # Create a cluster
             cluster = Cluster()
-            cluster.withClusterName(cluster_id)
-            .withKubeVersion(k8s_version) \
+            cluster.withClusterName(cluster_id) \
+                .withKubeVersion(k8s_version) \
                 .withOsDistro(image_name)
 
             cluster_yaml = create_cluster_yaml(cluster)
