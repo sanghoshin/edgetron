@@ -19,6 +19,7 @@ class InterfaceSerializer(serializers.ModelSerializer):
 class K8sCatalogSerializer(serializers.ModelSerializer):
     scaling = ScalingSerializer()
     interfaces = InterfaceSerializer()
+    clusterId = ""
 
     class Meta:
         model = K8sCatalog
