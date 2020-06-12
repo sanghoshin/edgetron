@@ -13,12 +13,13 @@ import uuid, random, subprocess, logging
 
 from edgetron.cluster-api-lib.cluster_api import *
 
-from edgetron.cluster-api-lib.machine import Machine
-from edgetron.cluster-api-lib.machineset import MachineSet
-from edgetron.cluster-api-lib.cluster import Cluster
-from edgetron.cluster-api-lib.network import Network
-from edgetron.cluster-api-lib.subnet import Subnet
-from edgetron.cluster-api-lib.ipaddress import Ipaddress
+from cluster_api import *
+
+from machine import Machine
+from machineset import MachineSet
+from cluster import Cluster
+from network import Network
+
 
 sona_ip = "10.2.1.33"
 host_list = ["10.2.1.68", "10.2.1.69", "10.2.1.70"]
@@ -122,7 +123,7 @@ def kubernetes_cluster(request):
 
             cluster_yaml = create_cluster_yaml(cluster)
             # create_cluster(cluster_yaml)
-            print cluster_yaml
+            logging.info(cluster_yaml)
 
 
         else:
