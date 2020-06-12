@@ -25,7 +25,8 @@ sona_ip = "10.2.1.33"
 host_list = ["10.2.1.68", "10.2.1.69", "10.2.1.70"]
 host_manager = HostManager(host_list)
 ip_manager = IpManager("10.10.1", "192.168.0")
-flat_network_id = str(uuid.uuid4()) # Need to be predefined
+flat_network_id = str(uuid.uuid4()) # Need to be configured
+flat_network_cidr = "10.10.10.0/24" # Need to be configured
 
 
 @csrf_exempt
@@ -64,11 +65,11 @@ def kubernetes_cluster(request):
             network_id = str(uuid.uuid4())
             segment_id = 1
             tenant_id = str(uuid.uuid4())
-            network = SonaNetwork(clusterId=cluster_id, networkId=network_id, segmentId=segment_id,
+            vm_network = SonaNetwork(clusterId=cluster_id, networkId=network_id, segmentId=segment_id,
                               tenantId=tenant_id)
-            network.save()
+            vm_network.save()
 
-            r = sona.create_network(network_id, segment_id, tenant_id)
+            r = sona.create_network(vm_network)
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
 
@@ -82,7 +83,7 @@ def kubernetes_cluster(request):
                             endIp=end, gateway=gateway)
             subnet.save()
 
-            r = sona.create_subnet(network_id, subnet_id, tenant_id, cidr, start, end, gateway)
+            r = sona.create_subnet(subnet)
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
 
@@ -97,29 +98,11 @@ def kubernetes_cluster(request):
                         tenantId=tenant_id, ipAddress=ip_address, macAddress=mac_address)
             port.save()
 
-            r = sona.create_port(network_id, subnet_id, port_id, ip_address, tenant_id, mac_address)
-            if r.status_code != 201:
-                return JsonResponse(r.text, safe=False)
-
-            cluster_id = serializer.clusterId
-            vcpus = serializer.vcpus
-            memory = serializer.memory
-            storage = serializer.storage
-            host_ip = host_manager.allocate(cluster_id, vcpus, memory, storage)
-            k8s_version = serializer.version
-            image_name = serializer.image
-            vm_ip = ip_manager.allocate_ip(port_id)
-            bootstrap_nw_ip = ip_manager.get_bootstrap_nw_ip(port_id)
-
-
 
             # Create a cluster
             cluster = Cluster()
-            cluster.withClusterName(cluster_id) \
-                .withPodCidr("10.10.0.0/16") \
-                .withServiceCidr("20.20.0.0/24") \
-                .withServiceDomain("mectb.io") \
-                .withKubeVersion(k8s_version) \
+            cluster.withClusterName(cluster_id)
+            .withKubeVersion(k8s_version) \
                 .withOsDistro(image_name)
 
             cluster_yaml = create_cluster_yaml(cluster)
@@ -128,11 +111,9 @@ def kubernetes_cluster(request):
 
             # Define flat and default network
             flat_net = Network(network_id)
-            flat_net.withIpAddress("10.10.10.5") \
-                .withSubnet("10.10.10.0/24")
+            flat_net.withSubnet(flat_network_cidr)
             default_net = Network(flat_network_id)
-            default_net.withIpAddress("20.20.20.5") \
-                .withSubnet("20.20.20.0/24") \
+            default_net.withSubnet(cidr) \
                 .setPrimary(True)
 
             # Create a master node
@@ -172,6 +153,24 @@ def kubernetes_cluster(request):
 
             status = get_cluster_status(cluster_id)
             logging.info(status)
+
+
+            r = sona.create_port(network_id, subnet_id, port_id, ip_address, tenant_id, mac_address)
+            if r.status_code != 201:
+                return JsonResponse(r.text, safe=False)
+
+            cluster_id = serializer.clusterId
+            vcpus = serializer.vcpus
+            memory = serializer.memory
+            storage = serializer.storage
+            host_ip = host_manager.allocate(cluster_id, vcpus, memory, storage)
+            k8s_version = serializer.version
+            image_name = serializer.image
+            vm_ip = ip_manager.allocate_ip(port_id)
+            bootstrap_nw_ip = ip_manager.get_bootstrap_nw_ip(port_id)
+
+
+
 
         else:
             return JsonResponse(serializer.errors, status=400)

@@ -7,44 +7,43 @@ class SonaHandler:
         self.sona_server_ip = sona_ip
         self.sona_url = "http://" + self.sona_server_ip + ":8181/onos/openstacknetworking/"
 
-    def create_subnet(self, network_id, subnet_id, tenant_id, cidr, start_ip, end_ip, gateway):
+    def create_subnet(self, subnet):
         url = self.sona_url + "subnets"
         payload = {
             "subnet": {
-                "id": subnet_id,
+                "id": subnet.subnet_id,
                 "allocation_pools": [
                     {
-                        "start": start_ip,
-                        "end": end_ip
+                        "start": subnet.start_ip,
+                        "end": subnet.end_ip
                     }
                 ],
-                "cidr": cidr,
+                "cidr": subnet.cidr,
                 "host_routes": [],
                 "subnetpool_id": "null",
                 "enable_dhcp": "true",
                 "name": "k8s VM subnet",
-                "network_id": network_id,
-                "tenant_id": tenant_id,
+                "network_id": subnet.network_id,
+                "tenant_id": subnet.tenant_id,
                 "ip_version": 4,
-                "cidr": "192.168.199.0/24",
-                "gateway_ip": gateway,
+                "gateway_ip": subnet.gateway,
             }
         }
         r = requests.post(url, headers=self.sona_headers, json=payload)
         return r
 
-    def create_network(self, network_id, segment_id, tenant_id):
+    def create_network(self, network):
         url = self.sona_url + "networks"
         payload = {
             "network": {
                 "status": "ACTIVE",
                 "subnets": [],
-                "id": network_id,
-                "provider:segmentation_id": segment_id,
+                "id": network.network_id,
+                "provider:segmentation_id": network.segment_id,
                 "is_default": "false",
                 "port_security_enabled": "true",
                 "name": "k8s_vm_network",
-                "tenant_id": tenant_id,
+                "tenant_id": network.tenant_id,
                 "admin_state_up": "true",
                 "provider:network_type": "vxlan",
                 "mtu": 1450
