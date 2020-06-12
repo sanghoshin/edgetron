@@ -152,6 +152,23 @@ def kubernetes_cluster(request):
             # create_machine(master_yaml)
             logging.info(master_yaml)
 
+            # Create a worker set
+            worker_set = MachineSet(5)
+            worker_set.withCluster(cluster) \
+                .withMachineType("worker") \
+                .withVcpuNum(vcpus) \
+                .withMemorySize(memory) \
+                .withDiskSize(storage) \
+                .withHostIpaddress(host_ip) \
+                .appendNet(flat_net) \
+                .appendNet(default_net) \
+                .withUseDpdk(True) \
+                .withCniName("sona-pt") \
+                .appendCniOption("onos-ip", sona_ip)
+
+            worker_set_yaml = create_machine_set_yaml(worker_set)
+            # create_machineset(worker_set_yaml)
+            logging.info(worker_set_yaml)
 
         else:
             return JsonResponse(serializer.errors, status=400)
