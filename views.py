@@ -3,7 +3,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 
-from edgetron.models import K8sCatalog, Network, Subnet, Port
+from edgetron.models import K8sCatalog, SonaNetwork, SonaSubnet, SonaPort
 from edgetron.serializers import K8sCatalogSerializer
 from edgetron.sonahandler import SonaHandler
 from edgetron.hostmanager import HostManager
@@ -63,7 +63,7 @@ def kubernetes_cluster(request):
             network_id = str(uuid.uuid4())
             segment_id = 1
             tenant_id = str(uuid.uuid4())
-            network = Network(clusterId=cluster_id, networkId=network_id, segmentId=segment_id,
+            network = SonaNetwork(clusterId=cluster_id, networkId=network_id, segmentId=segment_id,
                               tenantId=tenant_id)
             network.save()
 
@@ -76,7 +76,7 @@ def kubernetes_cluster(request):
             start = "10.10.1.2"
             end = "10.10.1.255"
             gateway = "10.10.1.1"
-            subnet = Subnet(networkId=network_id, subnetId=subnet_id,
+            subnet = SonaSubnet(networkId=network_id, subnetId=subnet_id,
                             tenantId=tenant_id, cidr=cidr, startIp=start,
                             endIp=end, gateway=gateway)
             subnet.save()
@@ -92,7 +92,7 @@ def kubernetes_cluster(request):
                         random.randint(0x00, 0xff),
                         random.randint(0x00, 0xff)]
             mac_address = ':'.join(map(lambda x: "%02x" % x, mac_data))
-            port = Port(portId=port_id, subnetId=subnet_id, networkId=network_id,
+            port = SonaPort(portId=port_id, subnetId=subnet_id, networkId=network_id,
                         tenantId=tenant_id, ipAddress=ip_address, macAddress=mac_address)
             port.save()
 

@@ -37,7 +37,7 @@ class K8sCatalog(models.Model):
         return self.clusterId + ":" + str(self.interfaces) + " : " + str(self.memory)
 
 
-class Network(models.Model):
+class SonaNetwork(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     clusterId = models.CharField(max_length=40, blank=False, default="0")
     networkId = models.CharField(max_length=40, blank=False)
@@ -51,7 +51,7 @@ class Network(models.Model):
         return self.clusterId + " : " + self.networkId + " : " + self.segmentId + " : " + self.tenantId
 
 
-class Subnet(models.Model):
+class SonaSubnet(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     subnetId = models.CharField(max_length=40, blank=False)
     networkId = models.CharField(max_length=40, blank=False)
@@ -68,7 +68,7 @@ class Subnet(models.Model):
         return self.networkId + " : " + self.subnetId + " : " + self.cidr
 
 
-class Port(models.Model):
+class SonaPort(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     portId = models.CharField(max_length=40, blank=False)
     subnetId = models.CharField(max_length=40, blank=False)
