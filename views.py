@@ -67,7 +67,7 @@ def kubernetes_cluster(request):
                               tenantId=tenant_id)
             network.save()
 
-            r = sona.send_network_request(network_id, segment_id, tenant_id)
+            r = sona.create_network(network_id, segment_id, tenant_id)
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
 
@@ -81,7 +81,7 @@ def kubernetes_cluster(request):
                             endIp=end, gateway=gateway)
             subnet.save()
 
-            r = sona.send_subnet_request(network_id, subnet_id, tenant_id, cidr, start, end, gateway)
+            r = sona.create_subnet(network_id, subnet_id, tenant_id, cidr, start, end, gateway)
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
 
@@ -96,7 +96,7 @@ def kubernetes_cluster(request):
                         tenantId=tenant_id, ipAddress=ip_address, macAddress=mac_address)
             port.save()
 
-            r = sona.send_createport_request(network_id, subnet_id, port_id, ip_address, tenant_id, mac_address)
+            r = sona.create_port(network_id, subnet_id, port_id, ip_address, tenant_id, mac_address)
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
 
