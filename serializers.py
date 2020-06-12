@@ -22,7 +22,7 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = K8sCatalog
-        fields = ['scaling', 'interfaces', 'masterNodes', 'memory', 'storage', 'vcpus']
+        fields = ['name', 'scaling', 'interfaces', 'masterNodes', 'memory', 'storage', 'vcpus', 'image', 'version']
 
     def create(self, validated_data):
         scaling_data = validated_data.pop('scaling')
@@ -31,6 +31,7 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
         interface_data = validated_data.pop('interfaces')
         interfaces = Interface.objects.create(**interface_data)
 
+        clusterName = validated_data.pop('name')
         masterNodes = validated_data.pop('masterNodes')
         memory = validated_data.pop('memory')
         storage = validated_data.pop('storage')
@@ -38,9 +39,9 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
         version = validated_data.pop('version')
         image = validated_data.pop('image')
 
-        k8s_data = K8sCatalog.objects.create(scaling=scaling, interfaces=interfaces, clusterId=str(uuid.uuid4()),
-                                           masterNodes=masterNodes, memory=memory, storage=storage,
-                                             vcpus=vcpus, version=version, image=image)
+        k8s_data = K8sCatalog.objects.create(name=clusterName, scaling=scaling, interfaces=interfaces,
+                                             clusterId=str(uuid.uuid4()), masterNodes=masterNodes, memory=memory,
+                                             storage=storage, vcpus=vcpus, version=version, image=image)
 
         return k8s_data
 

@@ -17,6 +17,7 @@ class Interface(models.Model):
 
 class K8sCatalog(models.Model):
     created = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=40, blank=False)
     scaling = models.ForeignKey(Scaling, related_name="catalog",
                                 on_delete=models.CASCADE)
     interfaces = models.ForeignKey(Interface, related_name="catalog",

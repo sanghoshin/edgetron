@@ -99,6 +99,7 @@ def kubernetes_cluster(request):
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
 
+            cluster_name = serializer.clusterName
             vcpus = serializer.vcpus
             memory = serializer.memory
             storage = serializer.storage
@@ -112,7 +113,7 @@ def kubernetes_cluster(request):
 
             # Create a cluster
             cluster = Cluster()
-            cluster.withClusterName("mectb") \
+            cluster.withClusterName(cluster_name) \
                 .withPodCidr("10.10.0.0/16") \
                 .withServiceCidr("20.20.0.0/24") \
                 .withServiceDomain("mectb.io") \
