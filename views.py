@@ -98,6 +98,14 @@ def kubernetes_cluster(request):
                         tenantId=tenant_id, ipAddress=ip_address, macAddress=mac_address)
             port.save()
 
+            vcpus = serializer.vcpus
+            memory = serializer.memory
+            storage = serializer.storage
+            host_ip = host_manager.allocate(cluster_id, vcpus, memory, storage)
+            k8s_version = serializer.version
+            image_name = serializer.image
+            vm_ip = ip_manager.allocate_ip(port_id)
+            bootstrap_nw_ip = ip_manager.get_bootstrap_nw_ip(port_id)
 
             # Create a cluster
             cluster = Cluster()
@@ -158,16 +166,6 @@ def kubernetes_cluster(request):
             r = sona.create_port(network_id, subnet_id, port_id, ip_address, tenant_id, mac_address)
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
-
-            cluster_id = serializer.clusterId
-            vcpus = serializer.vcpus
-            memory = serializer.memory
-            storage = serializer.storage
-            host_ip = host_manager.allocate(cluster_id, vcpus, memory, storage)
-            k8s_version = serializer.version
-            image_name = serializer.image
-            vm_ip = ip_manager.allocate_ip(port_id)
-            bootstrap_nw_ip = ip_manager.get_bootstrap_nw_ip(port_id)
 
 
 
