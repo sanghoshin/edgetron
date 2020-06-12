@@ -9,9 +9,11 @@ from edgetron.sonahandler import SonaHandler
 from edgetron.hostmanager import HostManager
 from edgetron.ipmanager import IpManager
 
-import uuid, random, subprocess, logging
+import uuid, random, subprocess, logging, sys
 
 from edgetron.cluster-api-lib.cluster_api import *
+
+sys.path.append("/home/ubuntu/mysite/cluster-api-lib")
 
 from cluster_api import *
 
