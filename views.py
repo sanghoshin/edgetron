@@ -11,6 +11,15 @@ from edgetron.ipmanager import IpManager
 
 import uuid, random, subprocess, logging
 
+from edgetron.cluster-api-lib.cluster_api import *
+
+from edgetron.cluster-api-lib.machine import Machine
+from edgetron.cluster-api-lib.machineset import MachineSet
+from edgetron.cluster-api-lib.cluster import Cluster
+from edgetron.cluster-api-lib.network import Network
+from edgetron.cluster-api-lib.subnet import Subnet
+from edgetron.cluster-api-lib.ipaddress import Ipaddress
+
 sona_ip = "10.2.1.33"
 host_list = ["10.2.1.68", "10.2.1.69", "10.2.1.70"]
 host_manager = HostManager(host_list)
@@ -98,6 +107,22 @@ def kubernetes_cluster(request):
             image_name = serializer.image
             vm_ip = ip_manager.allocate_ip(port_id)
             bootstrap_nw_ip = ip_manager.get_bootstrap_nw_ip(port_id)
+
+
+
+            # Create a cluster
+            cluster = Cluster()
+            cluster.withClusterName("mectb") \
+                .withPodCidr("10.10.0.0/16") \
+                .withServiceCidr("20.20.0.0/24") \
+                .withServiceDomain("mectb.io") \
+                .withKubeVersion(k8s_version) \
+                .withOsDistro(image_name)
+
+            cluster_yaml = create_cluster_yaml(cluster)
+            # create_cluster(cluster_yaml)
+            print cluster_yaml
+
 
         else:
             return JsonResponse(serializer.errors, status=400)
