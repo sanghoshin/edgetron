@@ -17,7 +17,7 @@ class Interface(models.Model):
 
 class K8sCatalog(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    name = models.CharField(max_length=40, blank=False)
+    name = models.CharField(max_length=40, blank=True)
     scaling = models.ForeignKey(Scaling, related_name="catalog",
                                 on_delete=models.CASCADE)
     interfaces = models.ForeignKey(Interface, related_name="catalog",
@@ -28,7 +28,7 @@ class K8sCatalog(models.Model):
     storage = models.IntegerField()
     vcpus = models.IntegerField()
     version = models.CharField(max_length=10, blank=True, default="1.17")
-    image = models.CharField(max_length=20, blank=False)
+    image = models.CharField(max_length=20, blank=False, default="ubuntu")
 
     class Meta:
         ordering = ['created']
