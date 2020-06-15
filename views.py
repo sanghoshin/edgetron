@@ -11,6 +11,7 @@ from edgetron.ipmanager import IpManager
 
 import uuid, random, subprocess, logging, sys
 
+# cluster library path needs to be added through configuration
 sys.path.append("/home/ubuntu/mysite/cluster-api-lib")
 
 from cluster_api import *
@@ -20,14 +21,15 @@ from machineset import MachineSet
 from cluster import Cluster
 from network import Network
 
-
+# The following values need to be set from MEPM configuration
 sona_ip = "10.2.1.33"
 host_list = ["10.2.1.68", "10.2.1.69", "10.2.1.70"]
+flat_network_cidr = "10.10.10.0/24"
+vm_network_cidr = "10.10.1.0/24"
+flat_network_id = str(uuid.uuid4())
+
 host_manager = HostManager(host_list)
-ip_manager = IpManager("10.10.1", "192.168.0")
-flat_network_id = str(uuid.uuid4()) # Need to be configured
-flat_network_cidr = "10.10.10.0/24" # Need to be configured
-vm_network_cidr = "10.10.1.0/24" # Need to be configured
+
 
 @csrf_exempt
 def catalog_list(request):
@@ -61,6 +63,7 @@ def kubernetes_cluster(request):
         if serializer.is_valid():
             serializer.save()
 
+            # Create a virtual network and subnet using SONA
             vm_network = SonaNetwork(clusterId=serializer.clusterId,
                                      networkId=str(uuid.uuid4()),
                                      segmentId=1,
@@ -79,15 +82,13 @@ def kubernetes_cluster(request):
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
 
-
+            # Extract variables from MEPM REST Call
             vcpus = serializer.vcpus
             memory = serializer.memory
             storage = serializer.storage
             host_ip = host_manager.allocate(vm_network.clusterId, vcpus, memory, storage)
             k8s_version = serializer.version
             image_name = serializer.image
-            #vm_ip = ip_manager.allocate_ip(port_id)
-            #bootstrap_nw_ip = ip_manager.get_bootstrap_nw_ip(port_id)
 
             # Create a cluster
             cluster = Cluster()
@@ -141,9 +142,8 @@ def kubernetes_cluster(request):
             # create_machineset(worker_set_yaml)
             logging.info(worker_set_yaml)
 
-            #status = get_cluster_status(cluster_id)
-            #logging.info(status)
-
+            # status = get_cluster_status(cluster_id)
+            # logging.info(status)
 
             port_id = str(uuid.uuid4())
             ip_address = "10.10.1.2"
@@ -163,9 +163,6 @@ def kubernetes_cluster(request):
             r = sona.create_port(port)
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
-
-
-
 
         else:
             return JsonResponse(serializer.errors, status=400)
