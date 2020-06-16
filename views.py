@@ -245,8 +245,9 @@ def check_cluster_status(sona, subnet):
         # logging.info(status)
         all_status = "COMPLETE"
         for status in cluster_status_temp.items():
-            logging.info("status : " + status)
-            if status != "Running":
+            state = status['state']
+            logging.info("state : " + state)
+            if state != "Running":
                 all_status = "PROCESSING"
         logging.info("Check thread: status is " + all_status)
 
