@@ -142,7 +142,7 @@ def kubernetes_cluster(request):
             # create_machineset(worker_set_yaml)
             logging.info(worker_set_yaml)
 
-            x = threading.Thread(target=check_cluster_status(), args=(sona, subnet))
+            x = threading.Thread(target=check_cluster_status, args=(sona, subnet,))
             logging.info("Start cluster status check thread")
             x.start()
         else:
@@ -248,6 +248,7 @@ def check_cluster_status(sona, subnet):
         for status in cluster_status_temp.items():
             if status != "Running":
                 all_status = "PROCESSING"
+        logging.info("Check thread: status is " + all_status)
 
 
     for machine, status in cluster_status_temp.items():
