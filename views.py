@@ -244,7 +244,7 @@ def check_cluster_status(sona, subnet):
         # cluster_status = get_cluster_status(cluster_id)
         # logging.info(status)
         all_status = "COMPLETE"
-        for status in cluster_status_temp.items():
+        for machine, status in cluster_status_temp.items():
             state = status['state']
             logging.info("state : " + state)
             if state != "Running":
