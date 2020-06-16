@@ -12,7 +12,7 @@ from edgetron.ipmanager import IpManager
 import uuid, random, subprocess, logging, sys, threading, time
 
 # cluster library path needs to be added through configuration
-sys.path.append("/home/ubuntu/mysite/cluster-api-lib")
+sys.path.append("./cluster-api-lib")
 
 from cluster_api import *
 
