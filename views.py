@@ -9,7 +9,7 @@ from edgetron.sonahandler import SonaHandler
 from edgetron.hostmanager import HostManager
 from edgetron.ipmanager import IpManager
 
-import uuid, random, subprocess, logging, sys
+import uuid, random, subprocess, logging, sys, threading, time
 
 # cluster library path needs to be added through configuration
 sys.path.append("/home/ubuntu/mysite/cluster-api-lib")
@@ -142,28 +142,9 @@ def kubernetes_cluster(request):
             # create_machineset(worker_set_yaml)
             logging.info(worker_set_yaml)
 
-            # status = get_cluster_status(cluster_id)
-            # logging.info(status)
-
-            port_id = str(uuid.uuid4())
-            ip_address = "10.10.1.2"
-            mac_data = [0x00, 0x16, 0x3e,
-                        random.randint(0x00, 0x7f),
-                        random.randint(0x00, 0xff),
-                        random.randint(0x00, 0xff)]
-            mac_address = ':'.join(map(lambda x: "%02x" % x, mac_data))
-            port = SonaPort(portId=port_id,
-                            subnetId=subnet.subnetId,
-                            networkId=subnet.networkId,
-                            tenantId=subnet.tenantId,
-                            ipAddress=ip_address,
-                            macAddress=mac_address)
-            port.save()
-
-            r = sona.create_port(port)
-            if r.status_code != 201:
-                return JsonResponse(r.text, safe=False)
-
+            x = threading.Thread(target=check_cluster_status(), args=(sona, subnet))
+            logging.info("Start cluster status check thread")
+            x.start()
         else:
             return JsonResponse(serializer.errors, status=400)
 
@@ -212,3 +193,84 @@ def deploy(host_ip, chart_path):
         logging.debug(error)
     else:
         logging.info(result)
+
+def check_cluster_status(sona, subnet):
+
+    # need to check the status continuously until it returns
+    # the correct status
+
+    cluster_status_temp = {
+        "mectb-test-master":{
+            "state":"Running",
+            "networks":[
+                {
+                    "interfaceName":"tap4b923054b50",
+                    "ipAddress":"192.168.200.51",
+                    "macAddress":"06:b3:7c:58:21:b6",
+                    "networkName":"flat-net"
+                }
+            ],
+            "id":"7e053658-9886-4828-a41d-fcb68c2e3d28"
+        },
+        "mectb-test-worker-set-6m8pf":{
+            "state":"Running",
+            "networks":[
+                {
+                    "interfaceName":"tape5873f89c38",
+                    "ipAddress":"192.168.200.3",
+                    "macAddress":"06:73:8d:d7:a9:e2",
+                    "networkName":"flat-net"
+                }
+            ],
+            "id":"a9dc320e-d320-4c18-831a-b839b8d3087c"
+        },
+        "mectb-test-worker-set-qrgwc":{
+            "state":"Running",
+            "networks":[
+                {
+                    "interfaceName":"tap03f4fd95a91",
+                    "ipAddress":"192.168.200.2",
+                    "macAddress":"06:21:63:25:25:3f",
+                    "networkName":"flat-net"
+                }
+            ],
+            "id":"2d0e47b6-1e51-41b8-b8bd-e91bcd442cf6"
+        }
+    }
+
+    cluster_status = {}
+    all_status = "PROCESSING"
+    while all_status != "COMPLETE":
+        time.sleep(1)
+        # cluster_status = get_cluster_status(cluster_id)
+        # logging.info(status)
+        all_status = "COMPLETE"
+        for status in cluster_status_temp.items():
+            if status != "Running":
+                all_status = "PROCESSING"
+
+
+    for machine, status in cluster_status_temp.items():
+        machine_name = machine
+        state = status['state']
+        vm_id = status['id']
+        networks = status['networks']
+        for network in networks:
+            mac = network['macAddress']
+            ip = network['ipAddress']
+            intf = network['interfaceName']
+            name = network['networkName']
+            #port_id = intf[3:]
+            port_id = str(uuid.uuid4())
+
+            port = SonaPort(portId=port_id,
+                            subnetId=subnet.subnetId,
+                            networkId=subnet.networkId,
+                            tenantId=subnet.tenantId,
+                            ipAddress=ip,
+                            macAddress=mac)
+            port.save()
+
+            r = sona.create_port(port)
+            if r.status_code != 201:
+                logging.error("SONA create port error!")
