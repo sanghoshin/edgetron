@@ -51,7 +51,7 @@ class SonaHandler:
             "port": {
                 "status": "DOWN",
                 "binding:host_id": "",
-                "id": port.pordId,
+                "id": port.portId,
                 "name": "private-port",
                 "network_id": port.networkId,
                 "mac_address": port.macAddress,
