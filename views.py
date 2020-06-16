@@ -22,7 +22,7 @@ from cluster import Cluster
 from network import Network
 
 # The following values need to be set from MEPM configuration
-sona_ip = "10.2.1.33"
+sona_ip = "192.168.0.236"
 host_list = ["10.2.1.68", "10.2.1.69", "10.2.1.70"]
 flat_network_cidr = "10.10.10.0/24"
 vm_network_cidr = "10.10.1.0/24"
@@ -97,7 +97,7 @@ def kubernetes_cluster(request):
                 .withOsDistro(image_name)
 
             cluster_yaml = create_cluster_yaml(cluster)
-            # create_cluster(cluster_yaml)
+            create_cluster(cluster_yaml)
             logging.info(cluster_yaml)
 
             # Define flat and default network
@@ -121,7 +121,7 @@ def kubernetes_cluster(request):
                 .appendCniOption("onos-ip", sona_ip)
 
             master_yaml = create_machine_yaml(master)
-            # create_machine(master_yaml)
+            create_machine(master_yaml)
             logging.info(master_yaml)
 
             # Create a worker set
@@ -139,7 +139,7 @@ def kubernetes_cluster(request):
                 .appendCniOption("onos-ip", sona_ip)
 
             worker_set_yaml = create_machine_set_yaml(worker_set)
-            # create_machineset(worker_set_yaml)
+            create_machineset(worker_set_yaml)
             logging.info(worker_set_yaml)
 
             check_cluster_status(sona, subnet)
@@ -241,18 +241,16 @@ def check_cluster_status(sona, subnet):
     all_status = "PROCESSING"
     while all_status != "COMPLETE":
         time.sleep(1)
-        # cluster_status = get_cluster_status(cluster_id)
-        # logging.info(status)
+        cluster_status = get_cluster_status(cluster_id)
+        logging.info(cluster_status)
         all_status = "COMPLETE"
-        for machine, status in cluster_status_temp.items():
+        for machine, status in cluster_status.items():
             state = status['state']
             logging.info("state : " + state)
             if state != "Running":
                 all_status = "PROCESSING"
-        logging.info("Check thread: status is " + all_status)
 
-
-    for machine, status in cluster_status_temp.items():
+    for machine, status in cluster_status.items():
         machine_name = machine
         state = status['state']
         vm_id = status['id']
@@ -262,8 +260,8 @@ def check_cluster_status(sona, subnet):
             ip = network['ipAddress']
             intf = network['interfaceName']
             name = network['networkName']
-            #port_id = intf[3:]
-            port_id = str(uuid.uuid4())
+            port_id = intf[3:]
+            #port_id = str(uuid.uuid4())
 
             port = SonaPort(portId=port_id,
                             subnetId=subnet.subnetId,
