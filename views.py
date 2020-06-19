@@ -25,7 +25,8 @@ from network import Network
 # The following values need to be set from MEPM configuration
 sona_ip = "192.168.0.236"
 host_list = ["192.168.0.236"]
-flat_network_cidr = "10.10.10.0/24"
+flat_network_cidr = "192.168.200.0/24"
+flat_network_ip = "192.168.200.51"
 vm_network_cidr = "10.10.1.0/24"
 flat_network_id = str(uuid.uuid4())
 
@@ -105,10 +106,13 @@ def kubernetes_cluster(request):
 
             # Define flat and default network
             flat_net = Network(vm_network.networkId)
-            flat_net.withSubnet(flat_network_cidr)
+            flat_net.withSubnet(flat_network_cidr) \
+                    .withIpAddress(flat_network_ip) \
+                    .setPrimary(True)
+
             default_net = Network(flat_network_id)
             default_net.withSubnet(vm_network_cidr) \
-                .setPrimary(True)
+                .setPrimary(False)
 
             # Create a master node
             master = Machine()
@@ -128,7 +132,7 @@ def kubernetes_cluster(request):
             logging.info(master_yaml)
 
             # Create a worker set
-            worker_set = MachineSet(5)
+            worker_set = MachineSet(3)
             worker_set.withCluster(cluster) \
                 .withMachineType("worker") \
                 .withVcpuNum(vcpus) \
