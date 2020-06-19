@@ -24,7 +24,7 @@ from network import Network
 
 # The following values need to be set from MEPM configuration
 sona_ip = "192.168.0.236"
-host_list = ["10.2.1.68", "10.2.1.69", "10.2.1.70"]
+host_list = ["192.168.0.236"]
 flat_network_cidr = "10.10.10.0/24"
 vm_network_cidr = "10.10.1.0/24"
 flat_network_id = str(uuid.uuid4())
@@ -120,7 +120,7 @@ def kubernetes_cluster(request):
                 .withHostIpaddress(host_ip) \
                 .appendNet(flat_net) \
                 .appendNet(default_net) \
-                .withCniName("sona-pt") \
+                .withCniName("calico") \
                 .appendCniOption("onos-ip", sona_ip)
 
             master_yaml = create_machine_yaml(master)
