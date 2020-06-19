@@ -94,11 +94,13 @@ def kubernetes_cluster(request):
             cluster = Cluster()
             cluster.withClusterName(vm_network.clusterId) \
                 .withKubeVersion(k8s_version) \
-                .withOsDistro(image_name)
+                .withServiceDomain("mectb.io") \
+                .withOsDistro(image_name) \
+                .withHelmVersion("3.0")
 
             cluster_yaml = create_cluster_yaml(cluster)
-            create_cluster(cluster_yaml)
             logging.info(cluster_yaml)
+            create_cluster(cluster_yaml)
 
             # Define flat and default network
             flat_net = Network(vm_network.networkId)

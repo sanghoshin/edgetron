@@ -19,7 +19,7 @@ class InterfaceSerializer(serializers.ModelSerializer):
 class K8sCatalogSerializer(serializers.ModelSerializer):
     scaling = ScalingSerializer()
     interfaces = InterfaceSerializer()
-    clusterId = ""
+    clusterId = str(uuid.uuid4())
     clusterName = ""
     vcpus = ""
     memory = ""
@@ -48,7 +48,7 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
         self.image = validated_data.pop('image')
 
         k8s_data = K8sCatalog.objects.create(name=self.clusterName, scaling=self.scaling, interfaces=self.interfaces,
-                                             clusterId=str(uuid.uuid4()), masterNodes=self.masterNodes, memory=self.memory,
+                                             clusterId=self.clusterId, masterNodes=self.masterNodes, memory=self.memory,
                                              storage=self.storage, vcpus=self.vcpus, version=self.version, image=self.image)
 
         return k8s_data
