@@ -145,7 +145,7 @@ def kubernetes_cluster(request):
             create_machineset(worker_set_yaml)
             logging.info(worker_set_yaml)
 
-            check_cluster_status(sona, subnet)
+            check_cluster_status(sona, subnet, vm_network.clusterId)
 
         else:
             return JsonResponse(serializer.errors, status=400)
@@ -196,47 +196,47 @@ def deploy(host_ip, chart_path):
     else:
         logging.info(result)
 
-def check_cluster_status(sona, subnet):
 
+def check_cluster_status(sona, subnet, cluster_id):
     # need to check the status continuously until it returns
     # the correct status
 
     cluster_status_temp = {
-        "mectb-test-master":{
-            "state":"Running",
-            "networks":[
+        "mectb-test-master": {
+            "state": "Running",
+            "networks": [
                 {
-                    "interfaceName":"tap4b923054b50",
-                    "ipAddress":"192.168.200.51",
-                    "macAddress":"06:b3:7c:58:21:b6",
-                    "networkName":"flat-net"
+                    "interfaceName": "tap4b923054b50",
+                    "ipAddress": "192.168.200.51",
+                    "macAddress": "06:b3:7c:58:21:b6",
+                    "networkName": "flat-net"
                 }
             ],
-            "id":"7e053658-9886-4828-a41d-fcb68c2e3d28"
+            "id": "7e053658-9886-4828-a41d-fcb68c2e3d28"
         },
-        "mectb-test-worker-set-6m8pf":{
-            "state":"Running",
-            "networks":[
+        "mectb-test-worker-set-6m8pf": {
+            "state": "Running",
+            "networks": [
                 {
-                    "interfaceName":"tape5873f89c38",
-                    "ipAddress":"192.168.200.3",
-                    "macAddress":"06:73:8d:d7:a9:e2",
-                    "networkName":"flat-net"
+                    "interfaceName": "tape5873f89c38",
+                    "ipAddress": "192.168.200.3",
+                    "macAddress": "06:73:8d:d7:a9:e2",
+                    "networkName": "flat-net"
                 }
             ],
-            "id":"a9dc320e-d320-4c18-831a-b839b8d3087c"
+            "id": "a9dc320e-d320-4c18-831a-b839b8d3087c"
         },
-        "mectb-test-worker-set-qrgwc":{
-            "state":"Running",
-            "networks":[
+        "mectb-test-worker-set-qrgwc": {
+            "state": "Running",
+            "networks": [
                 {
-                    "interfaceName":"tap03f4fd95a91",
-                    "ipAddress":"192.168.200.2",
-                    "macAddress":"06:21:63:25:25:3f",
-                    "networkName":"flat-net"
+                    "interfaceName": "tap03f4fd95a91",
+                    "ipAddress": "192.168.200.2",
+                    "macAddress": "06:21:63:25:25:3f",
+                    "networkName": "flat-net"
                 }
             ],
-            "id":"2d0e47b6-1e51-41b8-b8bd-e91bcd442cf6"
+            "id": "2d0e47b6-1e51-41b8-b8bd-e91bcd442cf6"
         }
     }
 
@@ -264,7 +264,7 @@ def check_cluster_status(sona, subnet):
             intf = network['interfaceName']
             name = network['networkName']
             port_id = intf[3:]
-            #port_id = str(uuid.uuid4())
+            # port_id = str(uuid.uuid4())
 
             port = SonaPort(portId=port_id,
                             subnetId=subnet.subnetId,
