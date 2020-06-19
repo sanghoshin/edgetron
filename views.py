@@ -140,8 +140,7 @@ def kubernetes_cluster(request):
                 .withHostIpaddress(host_ip) \
                 .appendNet(flat_net) \
                 .appendNet(default_net) \
-                .withUseDpdk(True) \
-                .withCniName("sona-pt") \
+                .withCniName("calico") \
                 .appendCniOption("onos-ip", sona_ip)
 
             worker_set_yaml = create_machine_set_yaml(worker_set)
