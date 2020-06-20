@@ -26,11 +26,11 @@ from network import Network
 sona_ip = "192.168.0.236"
 host_list = ["192.168.0.236"]
 flat_network_cidr = "192.168.200.0/24"
-flat_network_ip = "192.168.200.51"
 vm_network_cidr = "10.10.1.0/24"
 flat_network_id = str(uuid.uuid4())
 
 host_manager = HostManager(host_list)
+ip_manager = IpManager(flat_network_cidr)
 
 
 @csrf_exempt
@@ -106,6 +106,7 @@ def kubernetes_cluster(request):
             create_cluster(cluster_yaml)
 
             # Define flat and default network
+            flat_network_ip = ip_manager.allocate_ip(vm_network.clusterId)
             flat_net = Network(vm_network.networkId)
             flat_net.withSubnet(flat_network_cidr) \
                     .withIpAddress(flat_network_ip) \

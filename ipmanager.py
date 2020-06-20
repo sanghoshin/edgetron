@@ -1,29 +1,24 @@
 class IpManager:
     ipAllocations = {}
-    vm_subnet = ""
-    bootstrap_subnet = ""
+    subnet = ""
 
-    def __init__(self, vm_subnet, bootstrap_subnet):
-        self.vm_subnet = vm_subnet
-        self.bootstrap_subnet = bootstrap_subnet
-        for ip in range(1, 255):
+    def __init__(self, subnet):
+        self.subnet = subnet[:len(subnet)-4]
+        for ip in range(2, 255):
             self.ipAllocations[ip] = ''
 
-    def allocate_ip(self, port_id):
-        for ip in range(1, 255):
+    def allocate_ip(self, cluster_id):
+        for ip in range(2, 255):
             if self.ipAllocations[ip] == '':
-                self.ipAllocations[ip] = port_id
-                ip_address = self.vm_subnet + "." + str(ip)
+                self.ipAllocations[ip] = cluster_id
+                ip_address = self.subnet + str(ip)
                 return ip_address
         return ""
 
-    def get_bootstrap_nw_ip(self, port_id):
-        for ip in range(1, 255):
+    def get_bootstrap_nw_ip(self, cluster_id):
+        for ip in range(2, 255):
             if self.ipAllocations[ip] == '':
-                self.ipAllocations[ip] = port_id
-                ip_address = self.vm_subnet + "." + str(ip)
+                self.ipAllocations[ip] = cluster_id
+                ip_address = self.subnet + "." + str(ip)
                 return ip_address
         return ""
-
-
-
