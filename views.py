@@ -91,6 +91,7 @@ def kubernetes_cluster(request):
             host_ip = host_manager.allocate(vm_network.clusterId, vcpus, memory, storage)
             k8s_version = serializer.version
             image_name = serializer.image
+            nodes = serializer.scaling.init
 
             # Create a cluster
             cluster = Cluster()
@@ -131,7 +132,7 @@ def kubernetes_cluster(request):
             logging.info(master_yaml)
 
             # Create a worker set
-            worker_set = MachineSet(3)
+            worker_set = MachineSet(nodes)
             worker_set.withCluster(cluster) \
                 .withMachineType("worker") \
                 .withVcpuNum(vcpus) \
