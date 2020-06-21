@@ -172,8 +172,11 @@ def deployment_application(request, cid, chartid):
         serializer = K8sCatalogSerializer(data=data)
         if serializer.is_valid():
             chart_path = get_chart_path(chartid)
-            host_ip = host_manager.get_host_ip(cid)
-            deploy(host_ip, chart_path)
+            # Originally, we need to logon to the host and master VM again
+            # for installation of application.
+            #host_ip = host_manager.get_host_ip(cid)
+            master_vm_ip = ip_manager.get_master_ip(cid)
+            deploy(master_vm_ip, chart_path)
         else:
             return JsonResponse(serializer.errors, status=400)
 
@@ -188,8 +191,10 @@ def get_chart_path(chart_id):
 
 def deploy(host_ip, chart_path):
     command = "helm install my-release " + chart_path
+    key_file = "/home/sdn/.ssh/id_rsa_k8s"
+    host_access = "kubernetes@" + host_ip
 
-    ssh = subprocess.Popen(["ssh", "%s" % host_ip, command],
+    ssh = subprocess.call(["ssh", "-i", key_file, host_access, command],
                            shell=False,
                            stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE)
