@@ -155,6 +155,10 @@ def kubernetes_cluster(request):
             return JsonResponse(serializer.errors, status=400)
 
         return JsonResponse(serializer.data, status=200)
+    elif request.method == 'GET':
+        cluster_info_response = get_cluster_info()
+        return cluster_info_response
+
 
 
 @csrf_exempt
@@ -286,3 +290,9 @@ def check_cluster_status(sona, subnet, cluster_id):
             r = sona.create_port(port)
             if r.status_code != 201:
                 logging.error("SONA create port error!")
+
+
+def get_cluster_info():
+    clusters = K8sCatalog.objects.all()
+    serializer = K8sCatalogSerializer(clusters, many=True)
+    return JsonResponse(serializer.data, safe=False)
