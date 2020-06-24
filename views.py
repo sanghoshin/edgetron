@@ -169,7 +169,7 @@ def deployment_application(request, cid, chartid):
     try:
         catalog = K8sCatalog.objects.get(pk=cid)
     except K8sCatalog.DoesNotExist:
-        return HttpResponse(status=404)
+        return HttpResponse(status=400)
 
     if request.method == 'POST':
         data = JSONParser().parse(request)
