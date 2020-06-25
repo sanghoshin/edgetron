@@ -3,7 +3,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 
-from edgetron.models import K8sCatalog, SonaNetwork, SonaSubnet, SonaPort
+from edgetron.models import K8sCatalog, SonaNetwork, SonaSubnet, SonaPort,json
 from edgetron.serializers import K8sCatalogSerializer
 from edgetron.sonahandler import SonaHandler
 from edgetron.hostmanager import HostManager
@@ -294,5 +294,9 @@ def check_cluster_status(sona, subnet, cluster_id):
 
 def get_cluster_info():
     clusters = K8sCatalog.objects.all()
-    serializer = K8sCatalogSerializer(clusters, many=True)
-    return JsonResponse(serializer.data, safe=False)
+    cluster_info = {}
+    for cluster in clusters:
+        cluster_item = {cluster.clusterId: cluster.name}
+        cluster_info.append(json.dumps(cluster_item))
+
+    return JsonResponse(cluster_info, safe=False)
