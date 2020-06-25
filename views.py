@@ -166,9 +166,14 @@ def deployment_application(request, cid, chartid):
     """""
     Deploy Application
     """""
+
+    logging.info("Deploy app " + chartid + " in cluster " + cid)
+
     try:
-        catalog = K8sCatalog.objects.get(clusterId=cid)
+        clusterId = str(cid)
+        catalog = K8sCatalog.objects.get(clusterId=clusterId)
     except K8sCatalog.DoesNotExist:
+        logging.error("Cannot find cluster with clusterId " + clusterId)
         return HttpResponse(status=400)
 
     if request.method == 'POST':
