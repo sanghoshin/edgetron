@@ -3,13 +3,13 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 
-from edgetron.models import K8sCatalog, SonaNetwork, SonaSubnet, SonaPort,json
+from edgetron.models import K8sCatalog, SonaNetwork, SonaSubnet, SonaPort
 from edgetron.serializers import K8sCatalogSerializer
 from edgetron.sonahandler import SonaHandler
 from edgetron.hostmanager import HostManager
 from edgetron.ipmanager import IpManager
 
-import uuid, random, subprocess, logging, sys, threading, time
+import uuid, random, subprocess, logging, sys, threading, time, json
 
 # cluster library path needs to be added through configuration
 sys.path.append("./cluster-api-lib")
