@@ -167,7 +167,7 @@ def deployment_application(request, cid, chartid):
     Deploy Application
     """""
     try:
-        catalog = K8sCatalog.objects.get(pk=cid)
+        catalog = K8sCatalog.objects.get(clusterId=cid)
     except K8sCatalog.DoesNotExist:
         return HttpResponse(status=400)
 
