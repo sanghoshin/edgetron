@@ -294,7 +294,7 @@ def check_cluster_status(sona, subnet, cluster_id):
 
 def get_cluster_info():
     clusters = K8sCatalog.objects.all()
-    cluster_info = {}
+    cluster_info = []
     for cluster in clusters:
         cluster_item = {cluster.clusterId: cluster.name}
         cluster_info.append(json.dumps(cluster_item))
