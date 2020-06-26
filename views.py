@@ -205,24 +205,14 @@ def deploy(host_ip, chart_path):
     no_prompt = "-o StrictHostKeyChecking no"
     host_access = "kubernetes@" + host_ip
 
-    ssh = subprocess.call(["ssh", "-i", key_file, no_prompt, host_access, command_to_add_repo],
-                          shell=False,
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE)
-    if ssh != 0:
-        logging.error("Failed to add repository")
-    else:
-        logging.info("Repository is added successfully")
+    ssh_output = subprocess.check_output(["ssh", "-i", key_file, no_prompt, host_access, command_to_add_repo],
+                                  stdin=None, stderr=None, universal_newlines=False, shell=False)
 
-    ssh = subprocess.call(["ssh", "-i", key_file, no_prompt, host_access, command],
-                           shell=False,
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE)
+    logging.info(ssh_output)
 
-    if ssh != 0:
-        logging.error("Failed to depoly the application")
-    else:
-        logging.info("The application is deployed successfully")
+    ssh = subprocess.check_output(["ssh", "-i", key_file, no_prompt, host_access, command],
+                                  stdin=None, stderr=None, shell=False, universal_newlines=False)
+    logging.info(ssh_output)
 
 
 def check_cluster_status(sona, subnet, cluster_id):
