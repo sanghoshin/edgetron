@@ -200,13 +200,25 @@ def get_chart_path(chart_id):
 
 def deploy(host_ip, chart_path):
     command = "helm install my-release " + chart_path
-    key_file = "/home/sdn/.ssh/id_rsa_k8s"
+    command_to_add_repo = "helm repo add bitnami https://charts.bitnami.com/bitnami"
+    key_file = "id_rsa_k8s"
+    no_prompt = "-o StrictHostKeyChecking no"
     host_access = "kubernetes@" + host_ip
 
-    ssh = subprocess.call(["ssh", "-i", key_file, host_access, command],
+    ssh = subprocess.call(["ssh", "-i", key_file, no_prompt, host_access, command_to_add_repo],
+                          shell=False,
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE)
+    if ssh != 0:
+        logging.error("Failed to add repository")
+    else:
+        logging.info("Repository is added successfully")
+
+    ssh = subprocess.call(["ssh", "-i", key_file, no_prompt, host_access, command],
                            shell=False,
                            stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE)
+
     if ssh != 0:
         logging.error("Failed to depoly the application")
     else:
