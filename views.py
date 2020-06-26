@@ -207,12 +207,10 @@ def deploy(host_ip, chart_path):
                            shell=False,
                            stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE)
-    result = ssh.stdout.readlines()
-    if not result:
-        error = ssh.stderr.readlines()
-        logging.debug(error)
+    if ssh != 0:
+        logging.error("Failed to depoly the application")
     else:
-        logging.info(result)
+        logging.info("The application is deployed successfully")
 
 
 def check_cluster_status(sona, subnet, cluster_id):
