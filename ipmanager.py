@@ -17,8 +17,7 @@ class IpManager:
 
     def get_master_ip(self, cluster_id):
         for ip in range(2, 255):
-            if self.ipAllocations[ip] == '':
-                self.ipAllocations[ip] = cluster_id
-                ip_address = self.subnet + "." + str(ip)
+            if self.ipAllocations[ip] == cluster_id:
+                ip_address = self.subnet + str(ip)
                 return ip_address
         return ""
