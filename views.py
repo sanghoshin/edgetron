@@ -13,7 +13,7 @@ import uuid, random, subprocess, logging, sys, threading, time, json
 
 # cluster library path needs to be added through configuration
 sys.path.append("./cluster-api-lib")
-logging.basicConfig(filename="./edgetro.log", level=logging.INFO)
+logging.basicConfig(filename="./edgetron.log", level=logging.INFO)
 
 from cluster_api import *
 

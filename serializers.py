@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from edgetron.models import K8sCatalog, Scaling, Interface
+from edgetron.models import K8sCatalog, Scaling, Interface, ApplicationCatalog, Repository, Chart
 
 import uuid
 
@@ -53,3 +53,37 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
 
         return k8s_data
 
+
+class AppCatalogSerializer(serializers.ModelSerializer):
+    applicationId = ""
+    clusterId = ""
+    repository = RepositorySerializer()
+    chart = ChartSerializer()
+
+    class Meta:
+        model = ApplicationCatalog
+        fields = ['application ID', 'cluster ID', 'repository', 'chart']
+
+    def create(self, validated_data):
+        self.applicationId = validated_data.pop('application ID')
+        self.clusterId = validated_data.pop('cluster ID')
+        repository_data = validated_data.pop('repository')
+        self.repository = Repository.objects.create(**repository_data)
+        chart_data = validated_data.pop('chart')
+        self.repository = Chart.objects.create(**chart_data)
+
+        appData = ApplicationCatalog.objects.create(clusterId=self.clusterId,
+                                                    applicationId=self.applicationId,
+                                                    repository=self.repository,
+                                                    chart=self.chart)
+        return appData
+
+class RepositorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Repository
+        fields = ['name', 'url']
+
+class ChartSerialization(serializers.ModelSerializer):
+    class Meta:
+        model = Chart
+        fields = ['id', 'name']

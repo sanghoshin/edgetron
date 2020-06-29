@@ -37,6 +37,28 @@ class K8sCatalog(models.Model):
         return self.clusterId + ":" + str(self.interfaces) + " : " + str(self.memory)
 
 
+class Repository(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=40, blank=True)
+    url = models.CharField(max_length=200, blank=True)
+
+
+class Chart(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.CharField(max_length=40, blank=False, default="0")
+    name = models.CharField(max_length=100, blank=True)
+
+
+class ApplicationCatalog(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    applicationId = models.CharField(max_length=40, blank=False, default="0")
+    clusterId = models.CharField(max_length=40, blank=False, default="0")
+    repository = models.ForeignKey(Repository, related_name="application",
+                                on_delete=models.CASCADE)
+    chart = models.ForeignKey(Chart, related_name="application",
+                                   on_delete=models.CASCADE)
+
+
 class SonaNetwork(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     clusterId = models.CharField(max_length=40, blank=False, default="0")
