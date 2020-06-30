@@ -63,7 +63,7 @@ class RepositorySerializer(serializers.ModelSerializer):
 class ChartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chart
-        fields = ['id', 'name']
+        fields = ['chartId', 'name']
 
 
 class AppCatalogSerializer(serializers.ModelSerializer):
@@ -74,11 +74,11 @@ class AppCatalogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ApplicationCatalog
-        fields = ['application ID', 'cluster ID', 'repository', 'chart']
+        fields = ['applicationId', 'clusterId', 'repository', 'chart']
 
     def create(self, validated_data):
-        self.applicationId = validated_data.pop('application ID')
-        self.clusterId = validated_data.pop('cluster ID')
+        self.applicationId = validated_data.pop('applicationId')
+        self.clusterId = validated_data.pop('clusterId')
         repository_data = validated_data.pop('repository')
         self.repository = Repository.objects.create(**repository_data)
         chart_data = validated_data.pop('chart')
