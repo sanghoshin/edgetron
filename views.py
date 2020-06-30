@@ -192,12 +192,6 @@ def deployment_application(request, cid, chartid):
         return JsonResponse(serializer.data, status=200)
 
 
-def get_chart_path(chart_id):
-    """ Originally chart path needs to be extracted from DB
-        using the chart_id """
-    return "bitnami/nginx"
-
-
 def deploy(host_ip, chart_path):
     command = "helm install my-release " + chart_path
     command_to_add_repo = "helm repo add bitnami https://charts.bitnami.com/bitnami"
@@ -222,7 +216,26 @@ def deployment(request):
         data = JSONParser().parse(request)
         serializer = AppCatalogSerializer(data=data)
         if serializer.is_valid():
-            logging.info(serializer)
+            chart = serializer.chart
+            repo = serializer.repository
+            master_vm_ip = ip_manager.get_master_ip(serializer.clusterId)
+
+            command = "helm install " + serializer.applicationName + " " + chart.name
+            command_to_add_repo = "helm repo add " + repo.name + " " + repo.url
+            key_file = "id_rsa_k8s"
+            no_prompt = "-o StrictHostKeyChecking no"
+            host_access = "kubernetes@" + master_vm_ip
+
+            ssh_output = subprocess.check_output(["ssh", "-i", key_file, no_prompt, host_access, command_to_add_repo],
+                                                 stdin=None, stderr=None, universal_newlines=False, shell=False)
+            logging.info(ssh_output)
+
+            ssh_output = subprocess.check_output(["ssh", "-i", key_file, no_prompt, host_access, command],
+                                          stdin=None, stderr=None, shell=False, universal_newlines=False)
+            logging.info(ssh_output)
+        else:
+            logging.error("serializer is not valid")
+            return JsonResponse(serializer.data, status=400)
 
         return JsonResponse(serializer.data, status=200)
 
