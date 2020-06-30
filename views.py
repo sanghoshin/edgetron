@@ -215,6 +215,7 @@ def deploy(host_ip, chart_path):
     logging.info(ssh_output)
 
 
+@csrf_exempt
 def deployment(request):
 
     if request.method == 'POST':

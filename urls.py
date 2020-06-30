@@ -5,4 +5,5 @@ from edgetron import views
 urlpatterns = [
     path('edgetron/resources/kubernetes', views.kubernetes_cluster),
     path('edgetron/resources/kubernetes/application/deployment/<cid>/<chartid>/', views.deployment_application),
+    path('edgetron/resources/kubernetes/application/deployment/', views.deployment),
 ]

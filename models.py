@@ -45,7 +45,7 @@ class Repository(models.Model):
 
 class Chart(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    id = models.CharField(max_length=40, blank=False, default="0")
+    chartId = models.CharField(max_length=40, blank=False, default="0")
     name = models.CharField(max_length=100, blank=True)
 
 
