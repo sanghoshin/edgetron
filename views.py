@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 
 from edgetron.models import K8sCatalog, SonaNetwork, SonaSubnet, SonaPort
-from edgetron.serializers import K8sCatalogSerializer
+from edgetron.serializers import K8sCatalogSerializer, AppCatalogSerializer
 from edgetron.sonahandler import SonaHandler
 from edgetron.hostmanager import HostManager
 from edgetron.ipmanager import IpManager
@@ -213,6 +213,19 @@ def deploy(host_ip, chart_path):
     ssh = subprocess.check_output(["ssh", "-i", key_file, no_prompt, host_access, command],
                                   stdin=None, stderr=None, shell=False, universal_newlines=False)
     logging.info(ssh_output)
+
+
+def deployment(request):
+
+    if request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = AppCatalogSerializer(data=data)
+        if serializer.is_valid():
+            logging.info(serializer)
+
+        return JsonResponse(serializer.data, status=200)
+
+    return JsonResponse(status=400)
 
 
 def check_cluster_status(sona, subnet, cluster_id):

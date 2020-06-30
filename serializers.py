@@ -54,6 +54,18 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
         return k8s_data
 
 
+class RepositorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Repository
+        fields = ['name', 'url']
+
+
+class ChartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chart
+        fields = ['id', 'name']
+
+
 class AppCatalogSerializer(serializers.ModelSerializer):
     applicationId = ""
     clusterId = ""
@@ -77,13 +89,3 @@ class AppCatalogSerializer(serializers.ModelSerializer):
                                                     repository=self.repository,
                                                     chart=self.chart)
         return appData
-
-class RepositorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Repository
-        fields = ['name', 'url']
-
-class ChartSerialization(serializers.ModelSerializer):
-    class Meta:
-        model = Chart
-        fields = ['id', 'name']
