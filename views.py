@@ -216,6 +216,7 @@ def deployment(request):
         data = JSONParser().parse(request)
         serializer = AppCatalogSerializer(data=data)
         if serializer.is_valid():
+            serializer.save()
             chart = serializer.chart
             repo = serializer.repository
             master_vm_ip = ip_manager.get_master_ip(serializer.clusterId)
