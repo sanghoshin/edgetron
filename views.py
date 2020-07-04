@@ -161,55 +161,6 @@ def kubernetes_cluster(request):
         return cluster_info_response
 
 
-
-@csrf_exempt
-def deployment_application(request, cid, chartid):
-    """""
-    Deploy Application
-    """""
-
-    logging.info("Deploy app " + chartid + " in cluster " + cid)
-
-    try:
-        clusterId = str(cid)
-        catalog = K8sCatalog.objects.get(clusterId=clusterId)
-    except K8sCatalog.DoesNotExist:
-        logging.error("Cannot find cluster with clusterId " + clusterId)
-        return HttpResponse(status=400)
-
-    if request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = K8sCatalogSerializer(data=data)
-        if serializer.is_valid():
-            chart_path = get_chart_path(chartid)
-            # Originally, we need to logon to the host and master VM again
-            # for installation of application.
-            #host_ip = host_manager.get_host_ip(cid)
-            master_vm_ip = ip_manager.get_master_ip(cid)
-            deploy(master_vm_ip, chart_path)
-        else:
-            return JsonResponse(serializer.errors, status=400)
-
-        return JsonResponse(serializer.data, status=200)
-
-
-def deploy(host_ip, chart_path):
-    command = "helm install my-release " + chart_path
-    command_to_add_repo = "helm repo add bitnami https://charts.bitnami.com/bitnami"
-    key_file = "id_rsa_k8s"
-    no_prompt = "-o StrictHostKeyChecking no"
-    host_access = "kubernetes@" + host_ip
-
-    ssh_output = subprocess.check_output(["ssh", "-i", key_file, no_prompt, host_access, command_to_add_repo],
-                                  stdin=None, stderr=None, universal_newlines=False, shell=False)
-
-    logging.info(ssh_output)
-
-    ssh = subprocess.check_output(["ssh", "-i", key_file, no_prompt, host_access, command],
-                                  stdin=None, stderr=None, shell=False, universal_newlines=False)
-    logging.info(ssh_output)
-
-
 @csrf_exempt
 def deployment(request):
 
@@ -241,51 +192,14 @@ def deployment(request):
 
         return JsonResponse(serializer.data, status=200)
 
+    elif request.method == 'GET':
+        app_info_response = get_application_info()
+        return app_info_response
+
     return JsonResponse(status=400)
 
 
 def check_cluster_status(sona, subnet, cluster_id):
-    # need to check the status continuously until it returns
-    # the correct status
-
-    cluster_status_temp = {
-        "mectb-test-master": {
-            "state": "Running",
-            "networks": [
-                {
-                    "interfaceName": "tap4b923054b50",
-                    "ipAddress": "192.168.200.51",
-                    "macAddress": "06:b3:7c:58:21:b6",
-                    "networkName": "flat-net"
-                }
-            ],
-            "id": "7e053658-9886-4828-a41d-fcb68c2e3d28"
-        },
-        "mectb-test-worker-set-6m8pf": {
-            "state": "Running",
-            "networks": [
-                {
-                    "interfaceName": "tape5873f89c38",
-                    "ipAddress": "192.168.200.3",
-                    "macAddress": "06:73:8d:d7:a9:e2",
-                    "networkName": "flat-net"
-                }
-            ],
-            "id": "a9dc320e-d320-4c18-831a-b839b8d3087c"
-        },
-        "mectb-test-worker-set-qrgwc": {
-            "state": "Running",
-            "networks": [
-                {
-                    "interfaceName": "tap03f4fd95a91",
-                    "ipAddress": "192.168.200.2",
-                    "macAddress": "06:21:63:25:25:3f",
-                    "networkName": "flat-net"
-                }
-            ],
-            "id": "2d0e47b6-1e51-41b8-b8bd-e91bcd442cf6"
-        }
-    }
 
     cluster_status = {}
     all_status = "PROCESSING"
@@ -334,3 +248,12 @@ def get_cluster_info():
         cluster_info.append(json.dumps(cluster_item))
 
     return JsonResponse(cluster_info, safe=False)
+
+def get_application_info():
+    apps = ApplicationCatalog.objects.all()
+    app_info = []
+    for app in apps:
+        app_item = {apps.clusterId: apps.applicationName}
+        app_info.append(json.dumps(app_item))
+
+    return JsonResponse(app_info, safe=False)
