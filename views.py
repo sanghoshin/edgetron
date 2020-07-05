@@ -161,12 +161,26 @@ def kubernetes_cluster(request):
         return cluster_info_response
 
 
+def get_cluster_info_detail(cid):
+    try:
+        cluster = K8sCatalog.objects.get(clusterId=cid)
+    except K8sCatalog.DoesNoExist:
+        return HttpResponse(status=404)
+
+    cluster_info = {"clusterId": cluster.clusterId}
+    vm_info_list = []
+    cluster_status = get_cluster_status(cluster_id)
+    for machine, status in cluster_status.items():
+        state = status['state']
+        vm_info = {"name" : machine, "status": state}
+        vm_info_list.append(json.dumps(vm_info))
+
+
 @csrf_exempt
 def get_application_info_detail(cid):
-
     try:
         app = ApplicationCatalog.objects.get(clusterId=cid)
-    except ApplicationCatalog.DoesNoExist:
+    except ApplicationCatalog.DoesNotExist:
         return HttpResponse(status=404)
 
     app_info = {"clusterId": app.clusterName}
