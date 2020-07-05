@@ -162,6 +162,32 @@ def kubernetes_cluster(request):
 
 
 @csrf_exempt
+def get_application_info_detail(cid):
+
+    try:
+        app = ApplicationCatalog.objects.get(clusterId=cid)
+    except ApplicationCatalog.DoesNoExist:
+        return HttpResponse(status=404)
+
+    app_info = {"clusterId": app.clusterName}
+    app_info["name"] = app.applicationName
+    app_info["status"] = "Running"
+
+    # Need to extract from kubernetes cluster
+    pod_info = {"pod": "edgetron-deployment-5f6d596747-7xnk4"}
+    pod_info["ready"] = "1/1"
+    pod_info["status"] = "Running"
+    pod_info["restarts"] = "0"
+    pod_info["age"] = "100s"
+
+    app_info_list = []
+    app_info_list.append(pod_info)
+
+    app_info["pod-status"] = app_info_list
+
+    return JsonResponse(json.dumps(app_info), safe=False)
+
+@csrf_exempt
 def deployment(request):
 
     if request.method == 'POST':
@@ -249,6 +275,7 @@ def get_cluster_info():
 
     return JsonResponse(cluster_info, safe=False)
 
+
 def get_application_info():
     apps = ApplicationCatalog.objects.all()
     app_info = []
@@ -257,3 +284,4 @@ def get_application_info():
         app_info.append(json.dumps(app_item))
 
     return JsonResponse(app_info, safe=False)
+
