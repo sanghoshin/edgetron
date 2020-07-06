@@ -11,14 +11,14 @@ class SonaHandler:
         url = self.sona_url + "subnets"
         payload = {
             "subnet": {
-                "id": subnet.subnetId,
+                "id": subnet.subnet_id,
                 "cidr": subnet.cidr,
                 "host_routes": [],
                 "subnetpool_id": "null",
                 "enable_dhcp": "true",
                 "name": "k8s VM subnet",
-                "network_id": subnet.networkId,
-                "tenant_id": subnet.tenantId,
+                "network_id": subnet.network_id,
+                "tenant_id": subnet.tenant_id,
                 "ip_version": 4
             }
         }
@@ -31,12 +31,12 @@ class SonaHandler:
             "network": {
                 "status": "ACTIVE",
                 "subnets": [],
-                "id": network.networkId,
-                "provider:segmentation_id": network.segmentId,
+                "id": network.network_id,
+                "provider:segmentation_id": network.segment_id,
                 "is_default": "false",
                 "port_security_enabled": "true",
                 "name": "k8s_vm_network",
-                "tenant_id": network.tenantId,
+                "tenant_id": network.tenant_id,
                 "admin_state_up": "true",
                 "provider:network_type": "vxlan",
                 "mtu": 1450
@@ -51,17 +51,17 @@ class SonaHandler:
             "port": {
                 "status": "DOWN",
                 "binding:host_id": "",
-                "id": port.portId,
+                "id": port.port_id,
                 "name": "private-port",
-                "network_id": port.networkId,
-                "mac_address": port.macAddress,
+                "network_id": port.network_id,
+                "mac_address": port.mac_address,
                 "fixed_ips": [
                     {
-                        "subnet_id": port.subnetId,
-                        "ip_address": port.ipAddress
+                        "subnet_id": port.subnet_id,
+                        "ip_address": port.ip_address
                     }
                 ],
-                "tenant_id": port.tenantId
+                "tenant_id": port.tenant_id
             }
         }
         r = requests.post(url, headers=self.sona_headers, json=payload)

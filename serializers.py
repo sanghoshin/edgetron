@@ -13,24 +13,24 @@ class ScalingSerializer(serializers.ModelSerializer):
 class InterfaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interface
-        fields = ['ipVersion', 'ipAddress']
+        fields = ['ip_version', 'ip_address']
 
 
 class K8sCatalogSerializer(serializers.ModelSerializer):
     scaling = ScalingSerializer()
     interfaces = InterfaceSerializer()
-    clusterId = str(uuid.uuid4())
-    clusterName = ""
+    cluster_id = str(uuid.uuid4())
+    cluster_name = ""
     vcpus = ""
     memory = ""
     storage = ""
     version = ""
     image = ""
-    masterNodes = 0
+    master_nodes = 0
 
     class Meta:
         model = K8sCatalog
-        fields = ['name', 'scaling', 'interfaces', 'masterNodes', 'memory', 'storage', 'vcpus', 'image', 'version']
+        fields = ['name', 'scaling', 'interfaces', 'master_nodes', 'memory', 'storage', 'vcpus', 'image', 'version']
 
     def create(self, validated_data):
         scaling_data = validated_data.pop('scaling')
@@ -39,16 +39,16 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
         interface_data = validated_data.pop('interfaces')
         self.interfaces = Interface.objects.create(**interface_data)
 
-        self.clusterName = validated_data.pop('name')
-        self.masterNodes = validated_data.pop('masterNodes')
+        self.cluster_name = validated_data.pop('name')
+        self.master_nodes = validated_data.pop('master_nodes')
         self.memory = validated_data.pop('memory')
         self.storage = validated_data.pop('storage')
         self.vcpus = validated_data.pop('vcpus')
         self.version = validated_data.pop('version')
         self.image = validated_data.pop('image')
 
-        k8s_data = K8sCatalog.objects.create(name=self.clusterName, scaling=self.scaling, interfaces=self.interfaces,
-                                             clusterId=self.clusterId, masterNodes=self.masterNodes, memory=self.memory,
+        k8s_data = K8sCatalog.objects.create(name=self.cluster_name, scaling=self.scaling, interfaces=self.interfaces,
+                                             clusterId=self.cluster_id, masterNodes=self.master_nodes, memory=self.memory,
                                              storage=self.storage, vcpus=self.vcpus, version=self.version, image=self.image)
 
         return k8s_data
@@ -63,7 +63,7 @@ class RepositorySerializer(serializers.ModelSerializer):
 class ChartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chart
-        fields = ['chartId', 'name']
+        fields = ['chart_id', 'name']
 
 
 class AppCatalogSerializer(serializers.ModelSerializer):
@@ -74,11 +74,11 @@ class AppCatalogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ApplicationCatalog
-        fields = ['applicationName', 'clusterId', 'repository', 'chart']
+        fields = ['application_name', 'cluster_id', 'repository', 'chart']
 
     def create(self, validated_data):
-        self.applicationName = validated_data.pop('applicationName')
-        self.clusterId = validated_data.pop('clusterId')
+        self.application_name = validated_data.pop('application_name')
+        self.cluster_id = validated_data.pop('cluster_id')
         repository_data = validated_data.pop('repository')
         self.repository = Repository.objects.create(**repository_data)
         chart_data = validated_data.pop('chart')

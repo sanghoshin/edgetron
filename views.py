@@ -66,7 +66,7 @@ def kubernetes_cluster(request):
             serializer.save()
 
             # Create a virtual network and subnet using SONA
-            vm_network = SonaNetwork(clusterId=serializer.clusterId,
+            vm_network = SonaNetwork(clusterId=serializer.cluster_id,
                                      networkId=str(uuid.uuid4()),
                                      segmentId=1,
                                      tenantId=str(uuid.uuid4()))
@@ -75,9 +75,9 @@ def kubernetes_cluster(request):
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
 
-            subnet = SonaSubnet(networkId=vm_network.networkId,
+            subnet = SonaSubnet(networkId=vm_network.network_id,
                                 subnetId=str(uuid.uuid4()),
-                                tenantId=vm_network.tenantId,
+                                tenantId=vm_network.tenant_id,
                                 cidr=vm_network_cidr)
             subnet.save()
             r = sona.create_subnet(subnet)
@@ -88,14 +88,14 @@ def kubernetes_cluster(request):
             vcpus = serializer.vcpus
             memory = serializer.memory
             storage = serializer.storage
-            host_ip = host_manager.allocate(vm_network.clusterId, vcpus, memory, storage)
+            host_ip = host_manager.allocate(vm_network.cluster_id, vcpus, memory, storage)
             k8s_version = serializer.version
             image_name = serializer.image
             nodes = serializer.scaling.init
 
             # Create a cluster
             cluster = Cluster()
-            cluster.withClusterName(vm_network.clusterId) \
+            cluster.withClusterName(vm_network.cluster_id) \
                 .withKubeVersion(k8s_version) \
                 .withServiceDomain("mectb.io") \
                 .withOsDistro(image_name) \
@@ -106,8 +106,8 @@ def kubernetes_cluster(request):
             create_cluster(cluster_yaml)
 
             # Define flat and default network
-            flat_network_ip = ip_manager.allocate_ip(vm_network.clusterId)
-            flat_net = Network(vm_network.networkId)
+            flat_network_ip = ip_manager.allocate_ip(vm_network.cluster_id)
+            flat_net = Network(vm_network.network_id)
             flat_net.withSubnet(flat_network_cidr) \
                     .withIpAddress(flat_network_ip) \
                     .setPrimary(True)
@@ -150,7 +150,7 @@ def kubernetes_cluster(request):
             create_machineset(worker_set_yaml)
             logging.info(worker_set_yaml)
 
-            check_cluster_status(sona, subnet, vm_network.clusterId)
+            check_cluster_status(sona, subnet, vm_network.cluster_id)
 
         else:
             return JsonResponse(serializer.errors, status=400)
@@ -163,11 +163,11 @@ def kubernetes_cluster(request):
 
 def get_cluster_info_detail(cid):
     try:
-        cluster = K8sCatalog.objects.get(clusterId=cid)
+        cluster = K8sCatalog.objects.get(cluster_id=cid)
     except K8sCatalog.DoesNoExist:
         return HttpResponse(status=404)
 
-    cluster_info = {"clusterId": cluster.clusterId}
+    cluster_info = {"cluster_id": cluster.cluster_id}
     vm_info_list = []
     cluster_status = get_cluster_status(cluster_id)
     for machine, status in cluster_status.items():
@@ -183,8 +183,8 @@ def get_application_info_detail(cid):
     except ApplicationCatalog.DoesNotExist:
         return HttpResponse(status=404)
 
-    app_info = {"clusterId": app.clusterName}
-    app_info["name"] = app.applicationName
+    app_info = {"cluster_id": app.cluster_name}
+    app_info["name"] = app.application_name
     app_info["status"] = "Running"
 
     # Need to extract from kubernetes cluster
@@ -197,7 +197,7 @@ def get_application_info_detail(cid):
     app_info_list = []
     app_info_list.append(pod_info)
 
-    app_info["pod-status"] = app_info_list
+    app_info["pod_status"] = app_info_list
 
     return JsonResponse(json.dumps(app_info), safe=False)
 
@@ -211,9 +211,9 @@ def deployment(request):
             serializer.save()
             chart = serializer.chart
             repo = serializer.repository
-            master_vm_ip = ip_manager.get_master_ip(serializer.clusterId)
+            master_vm_ip = ip_manager.get_master_ip(serializer.cluster_id)
 
-            command = "helm install " + serializer.applicationName + " " + chart.name
+            command = "helm install " + serializer.application_name + " " + chart.name
             command_to_add_repo = "helm repo add " + repo.name + " " + repo.url
             key_file = "id_rsa_k8s"
             no_prompt = "-o StrictHostKeyChecking no"
@@ -268,9 +268,9 @@ def check_cluster_status(sona, subnet, cluster_id):
             # port_id = str(uuid.uuid4())
 
             port = SonaPort(portId=port_id,
-                            subnetId=subnet.subnetId,
-                            networkId=subnet.networkId,
-                            tenantId=subnet.tenantId,
+                            subnetId=subnet.subnet_id,
+                            networkId=subnet.network_id,
+                            tenantId=subnet.tenant_id,
                             ipAddress=ip,
                             macAddress=mac)
             port.save()
@@ -284,7 +284,7 @@ def get_cluster_info():
     clusters = K8sCatalog.objects.all()
     cluster_info = []
     for cluster in clusters:
-        cluster_item = {cluster.clusterId: cluster.name}
+        cluster_item = {cluster.cluster_id: cluster.name}
         cluster_info.append(json.dumps(cluster_item))
 
     return JsonResponse(cluster_info, safe=False)
@@ -294,7 +294,7 @@ def get_application_info():
     apps = ApplicationCatalog.objects.all()
     app_info = []
     for app in apps:
-        app_item = {apps.clusterId: apps.applicationName}
+        app_item = {apps.cluster_id: apps.application_name}
         app_info.append(json.dumps(app_item))
 
     return JsonResponse(app_info, safe=False)
