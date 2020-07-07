@@ -155,13 +155,36 @@ def kubernetes_cluster(request):
         else:
             return JsonResponse(serializer.errors, status=400)
 
-        return JsonResponse(serializer.data, status=200)
+        response = {"cluster_id": serializer.cluster_id}
+        return JsonResponse(json.dumps(response), status=200)
+
     elif request.method == 'GET':
         cluster_info_response = get_cluster_info()
         return cluster_info_response
 
 
-def get_cluster_info_detail(cid):
+@csrf_exempt
+def kubernetes_cluster_info(request, cid):
+    if request.method == 'POST':
+        try:
+            cluster = K8sCatalog.objects.get(cluster_id=cid)
+        except K8sCatalog.DoesNoExist:
+            return HttpResponse(status=404)
+
+        cluster_info = {"cluster_id": cluster.cluster_id}
+        vm_info_list = []
+        cluster_status = get_cluster_status(cluster_id)
+        for machine, status in cluster_status.items():
+            state = status['state']
+            vm_info = {"name" : machine, "status": state}
+            vm_info_list.append(json.dumps(vm_info))
+
+        return JsonResponse(json.dumps(app_info), safe=False)
+
+    return HttpResponse(status=400)
+
+
+def get_cluster_info_detail(request, cid):
     try:
         cluster = K8sCatalog.objects.get(cluster_id=cid)
     except K8sCatalog.DoesNoExist:
@@ -176,7 +199,7 @@ def get_cluster_info_detail(cid):
         vm_info_list.append(json.dumps(vm_info))
 
 
-@csrf_exempt
+
 def get_application_info_detail(cid):
     try:
         app = ApplicationCatalog.objects.get(clusterId=cid)
@@ -199,7 +222,7 @@ def get_application_info_detail(cid):
 
     app_info["pod_status"] = app_info_list
 
-    return JsonResponse(json.dumps(app_info), safe=False)
+    return
 
 @csrf_exempt
 def deployment(request):

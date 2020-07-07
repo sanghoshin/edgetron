@@ -8,8 +8,8 @@ class Scaling(models.Model):
 
 
 class Interface(models.Model):
-    ipVersion = models.CharField(max_length=4, blank=False, default='IPv4')
-    ipAddress = models.CharField(max_length=19, blank=False)
+    ip_version = models.IntegerField()
+    ip_address = models.CharField(max_length=19, blank=False)
 
     def __str__(self):
         return "(" + self.ipAddress + ")"
