@@ -125,7 +125,6 @@ def kubernetes_cluster(request):
                 .withDiskSize(storage) \
                 .withHostIpaddress(host_ip) \
                 .appendNet(flat_net) \
-                .appendNet(default_net) \
                 .withCniName("calico") \
                 .appendCniOption("onos-ip", sona_ip)
 
