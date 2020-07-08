@@ -8,7 +8,7 @@ class Scaling(models.Model):
 
 
 class Interface(models.Model):
-    ip_version = models.IntegerField()
+    ip_version = models.IntegerField(default=4)
     ip_address = models.CharField(max_length=19, blank=False)
 
     def __str__(self):
