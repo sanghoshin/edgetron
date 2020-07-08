@@ -48,7 +48,7 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
         self.image = validated_data.pop('image')
 
         k8s_data = K8sCatalog.objects.create(name=self.cluster_name, scaling=self.scaling, interfaces=self.interfaces,
-                                             clusterId=self.cluster_id, masterNodes=self.master_nodes, memory=self.memory,
+                                             cluster_id=self.cluster_id, master_nodes=self.master_nodes, memory=self.memory,
                                              storage=self.storage, vcpus=self.vcpus, version=self.version, image=self.image)
 
         return k8s_data
@@ -67,8 +67,8 @@ class ChartSerializer(serializers.ModelSerializer):
 
 
 class AppCatalogSerializer(serializers.ModelSerializer):
-    applicationName = ""
-    clusterId = ""
+    application_name = ""
+    cluster_id = ""
     repository = RepositorySerializer()
     chart = ChartSerializer()
 
@@ -84,8 +84,8 @@ class AppCatalogSerializer(serializers.ModelSerializer):
         chart_data = validated_data.pop('chart')
         self.chart = Chart.objects.create(**chart_data)
 
-        appData = ApplicationCatalog.objects.create(clusterId=self.clusterId,
-                                                    applicationName=self.applicationName,
+        appData = ApplicationCatalog.objects.create(cluster_id=self.cluster_id,
+                                                    application_name=self.application_name,
                                                     repository=self.repository,
                                                     chart=self.chart)
         return appData
