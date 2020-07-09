@@ -66,18 +66,18 @@ def kubernetes_cluster(request):
             serializer.save()
 
             # Create a virtual network and subnet using SONA
-            vm_network = SonaNetwork(clusterId=serializer.cluster_id,
-                                     networkId=str(uuid.uuid4()),
-                                     segmentId=1,
-                                     tenantId=str(uuid.uuid4()))
+            vm_network = SonaNetwork(cluster_id=serializer.cluster_id,
+                                     network_id=str(uuid.uuid4()),
+                                     segment_id=1,
+                                     tenant_id=str(uuid.uuid4()))
             vm_network.save()
             r = sona.create_network(vm_network)
             if r.status_code != 201:
                 return JsonResponse(r.text, safe=False)
 
-            subnet = SonaSubnet(networkId=vm_network.network_id,
-                                subnetId=str(uuid.uuid4()),
-                                tenantId=vm_network.tenant_id,
+            subnet = SonaSubnet(network_id=vm_network.network_id,
+                                subnet_id=str(uuid.uuid4()),
+                                tenant_id=vm_network.tenant_id,
                                 cidr=vm_network_cidr)
             subnet.save()
             r = sona.create_subnet(subnet)
@@ -201,7 +201,7 @@ def get_cluster_info_detail(request, cid):
 
 def get_application_info_detail(cid):
     try:
-        app = ApplicationCatalog.objects.get(clusterId=cid)
+        app = ApplicationCatalog.objects.get(cluster_id=cid)
     except ApplicationCatalog.DoesNotExist:
         return HttpResponse(status=404)
 
@@ -289,12 +289,12 @@ def check_cluster_status(sona, subnet, cluster_id):
             port_id = intf[3:]
             # port_id = str(uuid.uuid4())
 
-            port = SonaPort(portId=port_id,
-                            subnetId=subnet.subnet_id,
-                            networkId=subnet.network_id,
-                            tenantId=subnet.tenant_id,
-                            ipAddress=ip,
-                            macAddress=mac)
+            port = SonaPort(port_id=port_id,
+                            subnet_id=subnet.subnet_id,
+                            network_id=subnet.network_id,
+                            tenant_id=subnet.tenant_id,
+                            ip_address=ip,
+                            mac_address=mac)
             port.save()
 
             r = sona.create_port(port)
