@@ -42,10 +42,9 @@ class HostManager:
                 max = size
 
         for hostIp in self.hostAllocations.keys():
-            if len(self.hostAllocations[hostIp]) < max:
+            if len(self.hostAllocations[hostIp]) <= max:
                 return hostIp
 
-        return self.hostAllocations[0]
 
     def get_host_ip(self, cid):
         for host_ip in self.hostAllocations.keys():
