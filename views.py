@@ -174,6 +174,7 @@ def kubernetes_cluster_info(request, cid):
 
         cluster_info = {"cluster_id": cluster.cluster_id}
         vm_info_list = []
+        k8s_info_list = []
         cluster_status = get_cluster_status(cid)
         for machine, status in cluster_status.items():
             machine_name = machine
@@ -187,27 +188,15 @@ def kubernetes_cluster_info(request, cid):
             vm_info = {"name" : machine, "status": vm_state}
             vm_info_list.append(json.dumps(vm_info))
 
-        response = {"cluster_id" : cid, "vm": json.dumps(vm_info_list)}
+            k8s_info = {"node_name": machine, "status": kube_state,
+                        "info" : kube_info}
+            k8s_info_list.append(json.dumps(k8s_info))
+
+        response = {"cluster_id": cid, "vm": vm_info_list, "kubernetes": k8s_info_list}
 
         return JsonResponse(response, safe=False)
 
     return HttpResponse(status=400)
-
-
-def get_cluster_info_detail(request, cid):
-    try:
-        cluster = K8sCatalog.objects.get(cluster_id=cid)
-    except K8sCatalog.DoesNoExist:
-        return HttpResponse(status=404)
-
-    cluster_info = {"cluster_id": cluster.cluster_id}
-    vm_info_list = []
-    cluster_status = get_cluster_status(cluster_id)
-    for machine, status in cluster_status.items():
-        state = status['state']
-        vm_info = {"name" : machine, "status": state}
-        vm_info_list.append(json.dumps(vm_info))
-
 
 
 def get_application_info_detail(cid):
@@ -233,6 +222,7 @@ def get_application_info_detail(cid):
     app_info["pod_status"] = app_info_list
 
     return
+
 
 @csrf_exempt
 def deployment(request):
@@ -325,48 +315,6 @@ def check_cluster_status(sona, subnet, cluster_id):
         ipaddresses = []
         for network in networks:
             ipaddresses.append(network['ipAddress'])
-
-
-
-def check_cluster_status_old(sona, subnet, cluster_id):
-
-    cluster_status = {}
-    all_status = "PROCESSING"
-    while all_status != "COMPLETE":
-        time.sleep(1)
-        cluster_status = get_cluster_status(cluster_id)
-        logging.info(cluster_status)
-        all_status = "COMPLETE"
-        for machine, status in cluster_status.items():
-            state = status['state']
-            logging.info("state : " + state)
-            if state != "Running":
-                all_status = "PROCESSING"
-
-    for machine, status in cluster_status.items():
-        machine_name = machine
-        state = status['state']
-        vm_id = status['id']
-        networks = status['networks']
-        for network in networks:
-            mac = network['macAddress']
-            ip = network['ipAddress']
-            intf = network['interfaceName']
-            name = network['networkName']
-            port_id = intf[3:]
-            # port_id = str(uuid.uuid4())
-
-            port = SonaPort(port_id=port_id,
-                            subnet_id=subnet.subnet_id,
-                            network_id=subnet.network_id,
-                            tenant_id=subnet.tenant_id,
-                            ip_address=ip,
-                            mac_address=mac)
-            port.save()
-
-            r = sona.create_port(port)
-            if r.status_code != 201:
-                logging.error("SONA create port error!")
 
 
 def get_cluster_info():
