@@ -155,7 +155,7 @@ def kubernetes_cluster(request):
             return JsonResponse(serializer.errors, status=400)
 
         response = {"cluster_id": serializer.cluster_id}
-        return JsonResponse(json.dumps(response), status=200)
+        return JsonResponse(json.dumps(response), status=200, safe=False)
 
     elif request.method == 'GET':
         cluster_info_response = get_cluster_info()
