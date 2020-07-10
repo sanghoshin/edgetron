@@ -187,7 +187,9 @@ def kubernetes_cluster_info(request, cid):
             vm_info = {"name" : machine, "status": vm_state}
             vm_info_list.append(json.dumps(vm_info))
 
-        return JsonResponse(json.dumps(vm_info_list), safe=False)
+        response = {"cluster_id" : cid, "vm": json.dumps(vm_info_list)}
+
+        return JsonResponse(response, safe=False)
 
     return HttpResponse(status=400)
 
