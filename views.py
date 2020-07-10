@@ -271,6 +271,62 @@ def check_cluster_status(sona, subnet, cluster_id):
         logging.info(cluster_status)
         all_status = "COMPLETE"
         for machine, status in cluster_status.items():
+            vm_status = status['vm']
+            state = vm_status['state']
+            logging.info("state : " + state)
+            if state != "Running":
+                all_status = "PROCESSING"
+
+    cluster_status = get_cluster_status(cluster_id)
+    for machine, status in cluster_status.items():
+        machine_name = machine
+        vm_status = status['vm']
+        kube_status = status['kube']
+        vm_state = vm_status['state']
+        networks = vm_status['networks']
+        kube_state = kube_status['state']
+        kube_info = kube_status['info']
+
+        for network in networks:
+            mac = network['macAddress']
+            ip = network['ipAddress']
+            intf = network['interfaceName']
+            name = network['networkName']
+            port_id = intf[3:]
+            # port_id = str(uuid.uuid4())
+
+            port = SonaPort(port_id=port_id,
+                            subnet_id=subnet.subnet_id,
+                            network_id=subnet.network_id,
+                            tenant_id=subnet.tenant_id,
+                            ip_address=ip,
+                            mac_address=mac)
+            port.save()
+
+            r = sona.create_port(port)
+            if r.status_code != 201:
+                logging.error("SONA create port error!")
+
+        kube_version = "N/A"
+        if kube_info and kube_info.kubelet_version is not None:
+            kube_version = kube_info.kubelet_version
+
+        ipaddresses = []
+        for network in networks:
+            ipaddresses.append(network['ipAddress'])
+
+
+
+def check_cluster_status_old(sona, subnet, cluster_id):
+
+    cluster_status = {}
+    all_status = "PROCESSING"
+    while all_status != "COMPLETE":
+        time.sleep(1)
+        cluster_status = get_cluster_status(cluster_id)
+        logging.info(cluster_status)
+        all_status = "COMPLETE"
+        for machine, status in cluster_status.items():
             state = status['state']
             logging.info("state : " + state)
             if state != "Running":

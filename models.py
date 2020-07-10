@@ -12,7 +12,7 @@ class Interface(models.Model):
     ip_address = models.CharField(max_length=19, blank=False)
 
     def __str__(self):
-        return "(" + self.ipAddress + ")"
+        return "(" + self.ip_address + ")"
 
 
 class K8sCatalog(models.Model):
