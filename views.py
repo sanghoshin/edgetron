@@ -166,8 +166,10 @@ def kubernetes_cluster(request):
 def kubernetes_cluster_info(request, cid):
     if request.method == 'GET':
         try:
+            logging.info("Cluster info detail for " + cid)
             cluster = K8sCatalog.objects.get(cluster_id=cid)
         except K8sCatalog.DoesNoExist:
+            logging.error("Not found!!")
             return HttpResponse(status=404)
 
         cluster_info = {"cluster_id": cluster.cluster_id}
