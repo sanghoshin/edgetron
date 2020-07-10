@@ -164,7 +164,7 @@ def kubernetes_cluster(request):
 
 @csrf_exempt
 def kubernetes_cluster_info(request, cid):
-    if request.method == 'POST':
+    if request.method == 'GET':
         try:
             cluster = K8sCatalog.objects.get(cluster_id=cid)
         except K8sCatalog.DoesNoExist:
@@ -174,8 +174,15 @@ def kubernetes_cluster_info(request, cid):
         vm_info_list = []
         cluster_status = get_cluster_status(cluster_id)
         for machine, status in cluster_status.items():
-            state = status['state']
-            vm_info = {"name" : machine, "status": state}
+            machine_name = machine
+            vm_status = status['vm']
+            kube_status = status['kube']
+            vm_state = vm_status['state']
+            networks = vm_status['networks']
+            kube_state = kube_status['state']
+            kube_info = kube_status['info']
+
+            vm_info = {"name" : machine, "status": vm_state}
             vm_info_list.append(json.dumps(vm_info))
 
         return JsonResponse(json.dumps(app_info), safe=False)
