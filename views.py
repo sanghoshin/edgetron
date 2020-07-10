@@ -174,7 +174,7 @@ def kubernetes_cluster_info(request, cid):
 
         cluster_info = {"cluster_id": cluster.cluster_id}
         vm_info_list = []
-        cluster_status = get_cluster_status(cluster_id)
+        cluster_status = get_cluster_status(cid)
         for machine, status in cluster_status.items():
             machine_name = machine
             vm_status = status['vm']
