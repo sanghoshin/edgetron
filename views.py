@@ -183,16 +183,17 @@ def kubernetes_cluster_info(request, cid):
             vm_state = vm_status['state']
             networks = vm_status['networks']
             kube_state = kube_status['state']
-            kube_info = kube_status['info']
 
             vm_info = {"name" : machine, "status": vm_state}
             vm_info_list.append(json.dumps(vm_info))
 
-            k8s_info = {"node_name": machine, "status": kube_state,
-                        "info" : kube_info}
+            k8s_info = {"node_name": machine, "status": kube_state}
             k8s_info_list.append(json.dumps(k8s_info))
 
-        response = {"cluster_id": cid, "vm": vm_info_list, "kubernetes": k8s_info_list}
+            helm_status = get_helm_status(cid)
+
+        response = {"cluster_id": cid, "vm": vm_info_list, "kubernetes": k8s_info_list,
+                    "helm": helm_status}
 
         return JsonResponse(response, safe=False)
 
@@ -336,3 +337,21 @@ def get_application_info():
 
     return JsonResponse(app_info, safe=False)
 
+
+def get_helm_status(cid):
+
+    master_vm_ip = ip_manager.get_master_ip(cid)
+    command = "helm list"
+    key_file = "id_rsa_k8s"
+    no_prompt = "-o StrictHostKeyChecking no"
+    host_access = "kubernetes@" + master_vm_ip
+
+    try:
+        ssh_output = subprocess.check_output(["ssh", "-i", key_file, no_prompt, host_access, command],
+                                         stdin=None, stderr=None, universal_newlines=False, shell=False)
+    except:
+        return "Not Ready"
+
+    logging.info(ssh_output)
+
+    return ssh_output
