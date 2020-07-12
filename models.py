@@ -53,9 +53,9 @@ class ApplicationCatalog(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     application_name = models.CharField(max_length=40, blank=False)
     cluster_id = models.CharField(max_length=40, blank=False)
-    repository = models.ForeignKey(Repository, related_name="application",
+    repositories = models.ManyToManyField(Repository, related_name="application",
                                 on_delete=models.CASCADE)
-    chart = models.ForeignKey(Chart, related_name="application",
+    charts = models.ManyToManyField(Chart, related_name="application",
                                    on_delete=models.CASCADE)
 
 

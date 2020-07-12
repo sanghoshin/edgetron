@@ -74,18 +74,23 @@ class AppCatalogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ApplicationCatalog
-        fields = ['application_name', 'cluster_id', 'repository', 'chart']
+        fields = ['application_name', 'cluster_id', 'repositories', 'charts']
 
     def create(self, validated_data):
         self.application_name = validated_data.pop('application_name')
         self.cluster_id = validated_data.pop('cluster_id')
-        repository_data = validated_data.pop('repository')
-        self.repository = Repository.objects.create(**repository_data)
-        chart_data = validated_data.pop('chart')
-        self.chart = Chart.objects.create(**chart_data)
-
         appData = ApplicationCatalog.objects.create(cluster_id=self.cluster_id,
-                                                    application_name=self.application_name,
-                                                    repository=self.repository,
-                                                    chart=self.chart)
+                                                    application_name=self.application_name)
+        appData.save()
+
+        repositories_data = validated_data.get('repositories', [])
+        for repository_data in repositories_data:
+            repository = Repository.objects.create(**repository_data)
+            appData.repositories.add(*repository)
+
+        charts_data = validated_data.get('charts', [])
+        for chart_data in charts_data:
+            chart = Chart.objects.create(**chart_data)
+            appData.charts.add(*chart)
+
         return appData
