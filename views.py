@@ -172,7 +172,6 @@ def kubernetes_cluster_info(request, cid):
             logging.error("Not found!!")
             return HttpResponse(status=404)
 
-        cluster_info = {"cluster_id": cluster.cluster_id}
         vm_info_list = []
         k8s_info_list = []
         cluster_status = get_cluster_status(cid)
@@ -349,9 +348,9 @@ def get_helm_status(cid):
     try:
         ssh_output = subprocess.check_output(["ssh", "-i", key_file, no_prompt, host_access, command],
                                          stdin=None, stderr=None, universal_newlines=False, shell=False)
-    except:
+    except subprocess.CalledProcessError:
         return "Not Ready"
 
     logging.info(ssh_output)
 
-    return ssh_output
+    return "Ready"
