@@ -7,7 +7,7 @@ import uuid
 class ScalingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scaling
-        fields = ['init', 'maximum', 'minimum']
+        fields = ['current', 'maximum', 'minimum']
 
 
 class InterfaceSerializer(serializers.ModelSerializer):
@@ -19,7 +19,7 @@ class InterfaceSerializer(serializers.ModelSerializer):
 class K8sCatalogSerializer(serializers.ModelSerializer):
     scaling = ScalingSerializer()
     interfaces = InterfaceSerializer()
-    cluster_id = str(uuid.uuid4())
+    cluster_id = ""
     cluster_name = ""
     vcpus = ""
     memory = ""
@@ -40,6 +40,7 @@ class K8sCatalogSerializer(serializers.ModelSerializer):
         self.interfaces = Interface.objects.create(**interface_data)
 
         self.cluster_name = validated_data.pop('name')
+        self.cluster_id = self.cluster_name
         self.master_nodes = validated_data.pop('master_nodes')
         self.memory = validated_data.pop('memory')
         self.storage = validated_data.pop('storage')
@@ -63,14 +64,14 @@ class RepositorySerializer(serializers.ModelSerializer):
 class ChartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chart
-        fields = ['chart_id', 'name']
+        fields = ['order', 'chart_id', 'name']
 
 
 class AppCatalogSerializer(serializers.ModelSerializer):
     application_name = ""
     cluster_id = ""
-    repository = RepositorySerializer()
-    chart = ChartSerializer()
+    repositories = RepositorySerializer(many=True)
+    charts = ChartSerializer(many=True)
 
     class Meta:
         model = ApplicationCatalog
@@ -86,11 +87,14 @@ class AppCatalogSerializer(serializers.ModelSerializer):
         repositories_data = validated_data.get('repositories', [])
         for repository_data in repositories_data:
             repository = Repository.objects.create(**repository_data)
-            appData.repositories.add(*repository)
+            appData.repositories.add(repository)
 
         charts_data = validated_data.get('charts', [])
         for chart_data in charts_data:
             chart = Chart.objects.create(**chart_data)
-            appData.charts.add(*chart)
+            appData.charts.add(chart)
+
+        appData.save()
 
         return appData
+

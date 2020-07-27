@@ -20,4 +20,5 @@ class IpManager:
             if self.ipAllocations[ip] == cluster_id:
                 ip_address = self.subnet + str(ip)
                 return ip_address
-        return ""
+        # only for test
+        return self.subnet + "100"

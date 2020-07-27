@@ -2,9 +2,11 @@ import logging
 
 
 class HostManager:
+    hostList = []
     hostAllocations = {}
 
     def __init__(self, hosts):
+        self.hostList = hosts
         for item in hosts:
             self.hostAllocations[item] = []
 
@@ -35,15 +37,16 @@ class HostManager:
         return
 
     def allocate_host(self, vcpu, memory, disk):
-        max = 0
-        for cid_list in self.hostAllocations.items():
-            size = len(cid_list)
-            if max < size:
-                max = size
+        #max = 0
+        #for cid_list in self.hostAllocations.items():
+        #    size = len(cid_list)
+        #    if max < size:
+        #        max = size
 
-        for hostIp in self.hostAllocations.keys():
-            if len(self.hostAllocations[hostIp]) <= max:
-                return hostIp
+        #for hostIp in self.hostAllocations.keys():
+        #    if len(self.hostAllocations[hostIp]) <= max:
+        #       return hostIp
+        return self.hostList[0]
 
 
     def get_host_ip(self, cid):
